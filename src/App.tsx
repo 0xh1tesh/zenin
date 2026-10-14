@@ -1,11 +1,13 @@
 import { lazy } from 'react'
 import { createBrowserRouter, Link, RouterProvider, useRouteError } from 'react-router-dom'
 import Layout from './components/layout/Layout'
+import Events from './pages/Events'
+import Home from './pages/Home'
 import NotFound from './pages/NotFound'
 import './components/ui/ui.css'
 
-const Home = lazy(() => import('./pages/Home'))
-const Events = lazy(() => import('./pages/Events'))
+// The two entry routes are bundled with the app shell: a lazy chunk would add a request
+// round trip before the first card (and its image) could render. Detail stays lazy.
 const EventDetail = lazy(() => import('./pages/EventDetail'))
 
 /** Router-level failures (e.g. a lazy chunk that failed to load while offline). */
