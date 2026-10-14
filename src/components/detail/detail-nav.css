@@ -70,10 +70,5 @@
 }
 
 .detail-nav__num {
-  opacity: 0.75;
   font-variant-numeric: tabular-nums;
-}
-
-.detail-nav__link.is-active .detail-nav__num {
-  opacity: 1;
 }

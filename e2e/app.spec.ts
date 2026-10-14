@@ -89,7 +89,46 @@ for (const width of [375, 768, 1280]) {
   }
 }
 
+async function openFirstEvent(page: import('@playwright/test').Page) {
+  await page.goto('/events')
+  await page.locator('.ecard a').first().click()
+  await expect(page).toHaveURL(/\/events\/[\w-]+$/)
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+}
+
+for (const width of [375, 768, 1280]) {
+  test(`event detail has no horizontal scroll at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 })
+    await openFirstEvent(page)
+    await page.waitForLoadState('networkidle')
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)
+    expect(overflow).toBeLessThanOrEqual(0)
+  })
+}
+
+test.describe('reduced motion', () => {
+  test.use({ reducedMotion: 'reduce' })
+
+  test('the hero is a single static screen, not a pinned scroll scene', async ({ page }) => {
+    await page.goto('/')
+    const heights = await page.evaluate(() => ({
+      hero: document.querySelector('.hero')?.getBoundingClientRect().height ?? 0,
+      viewport: window.innerHeight,
+    }))
+    expect(heights.hero).toBeLessThanOrEqual(heights.viewport + 2)
+    await expect(page.getByRole('link', { name: /explore events/i }).first()).toBeVisible()
+  })
+})
+
 test.describe('accessibility', () => {
+  test('has no serious axe violations on an event page', async ({ page }) => {
+    await openFirstEvent(page)
+    await page.waitForLoadState('networkidle')
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze()
+    const blocking = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')
+    expect(blocking.map((v) => `${v.id}: ${v.nodes.length} node(s)`)).toEqual([])
+  })
+
   for (const path of ['/', '/events']) {
     test(`has no serious axe violations on ${path}`, async ({ page }) => {
       await page.goto(path)

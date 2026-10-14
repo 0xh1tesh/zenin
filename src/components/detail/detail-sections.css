@@ -337,6 +337,8 @@
 .detail-related__grid {
   display: grid;
   gap: 0.85rem;
+  /* minmax(0, 1fr): the column may shrink below its content, so cards never push the page wider */
+  grid-template-columns: minmax(0, 1fr);
 }
 
 /* ─── Section Skeletons ───────────────────────────────────────────────── */

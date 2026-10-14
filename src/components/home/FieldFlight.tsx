@@ -84,9 +84,12 @@ export default function FieldFlight({ events }: FieldFlightProps) {
     if (!stage) return
 
     let cleanup: (() => void) | undefined
+    // Cleanup can run before the async init resolves (StrictMode, fast layout flips): never build a late timeline.
+    let cancelled = false
 
     const init = () => {
       loadGsap().then(({ gsap }) => {
+        if (cancelled) return
         const slides = Array.from(stage.querySelectorAll<HTMLElement>('.field__slide'))
         if (slides.length === 0) return
 
@@ -133,6 +136,7 @@ export default function FieldFlight({ events }: FieldFlightProps) {
       : window.setTimeout(init, 800)
 
     return () => {
+      cancelled = true
       if (hasIdle) window.cancelIdleCallback(handle)
       else window.clearTimeout(handle)
       cleanup?.()

@@ -130,12 +130,13 @@
   padding-left: 1.75rem;
 }
 
+/* Dimmed, but never below WCAG AA for the muted text inside (0.9 keeps it above 4.5:1) */
 .programme-row.is-archived {
-  opacity: 0.55;
+  opacity: 0.9;
 }
 
 .programme-row.is-archived:hover {
-  opacity: 0.85;
+  opacity: 1;
 }
 
 .programme-row__date {

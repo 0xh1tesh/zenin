@@ -47,6 +47,11 @@
   transform-style: preserve-3d;
 }
 
+/* Before the scroll timeline exists, only the first slide is shown (no stacked flash) */
+.field__slide:not(:first-child) {
+  opacity: 0;
+}
+
 .field__slide {
   position: absolute;
   inset: 0;

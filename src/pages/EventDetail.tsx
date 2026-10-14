@@ -119,7 +119,8 @@ export default function EventDetail() {
 
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          // "<" is escaped so event text can never close the script tag
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
         />
 
         <DetailHero event={event} />
