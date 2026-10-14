@@ -1,0 +1,94 @@
+/* ─── Page header ─────────────────────────────────────────────────────── */
+.events-page__header {
+  padding-top: clamp(2rem, 6vw, 4.5rem);
+  padding-bottom: clamp(1.25rem, 3vw, 2rem);
+}
+
+.events-page__title {
+  margin-top: 0.9rem;
+  font-size: var(--step-4);
+  line-height: 0.95;
+}
+
+.events-page__title em {
+  font-style: normal;
+  color: var(--coral);
+}
+
+.events-page__lede {
+  max-width: 52ch;
+  margin-top: 1.1rem;
+  color: var(--muted);
+}
+
+/* Reserves the filter bar's height while data loads, so nothing jumps */
+.events-filter-skel {
+  height: 3.4rem;
+  border-block: 1px solid var(--line);
+  background: rgb(24 23 22 / 0.6);
+}
+
+/* ─── Results ─────────────────────────────────────────────────────────── */
+.events-results {
+  min-height: 60vh;
+  padding-bottom: clamp(3rem, 8vw, 6rem);
+}
+
+.events-cell {
+  min-width: 0;
+}
+
+.events-month {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: clamp(2rem, 5vw, 3rem) 0 1.25rem;
+  font: 700 var(--step-1) var(--font-display);
+  letter-spacing: -0.01em;
+  color: var(--sand);
+}
+
+.events-month::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line-strong);
+  order: 1;
+}
+
+.events-month__count {
+  order: 2;
+  font: 600 0.75rem var(--font-mono);
+  letter-spacing: 0.1em;
+  color: var(--coral);
+}
+
+.events-list {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 26rem), 1fr));
+}
+
+.events-list .events-cell {
+  display: block;
+}
+
+.events-more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: clamp(2.5rem, 6vw, 4rem);
+}
+
+.events-more__text {
+  font: 500 0.75rem var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.events-sentinel {
+  width: 1px;
+  height: 1px;
+}
