@@ -37,17 +37,32 @@ export interface EventFilters {
   view: ViewMode
 }
 
+// Allowed values for validation — prevents arbitrary URL values from passing through
+const VALID_KINDS: readonly string[] = ['technical', 'cultural']
+const VALID_TYPES: readonly string[] = ['event', 'workshop']
+const VALID_MODES: readonly string[] = ['online', 'offline']
+const VALID_PRICES: readonly string[] = ['free', 'paid']
+const VALID_SORTS: readonly string[] = ['soonest', 'price-asc', 'seats', 'deadline']
+
+function validateEnum<T extends string>(
+  value: string | null,
+  allowed: readonly string[],
+  fallback: T,
+): T {
+  if (value !== null && allowed.includes(value)) return value as T
+  return fallback
+}
+
 function read(params: URLSearchParams): EventFilters {
-  const sort = params.get('sort') ?? 'soonest'
   return {
     q: params.get('q') ?? '',
-    kind: (params.get('kind') as KindFilter) ?? '',
-    type: (params.get('type') as TypeFilter) ?? '',
-    mode: (params.get('mode') as ModeFilter) ?? '',
-    price: (params.get('price') as PriceFilter) ?? '',
+    kind: validateEnum<KindFilter>(params.get('kind'), VALID_KINDS, ''),
+    type: validateEnum<TypeFilter>(params.get('type'), VALID_TYPES, ''),
+    mode: validateEnum<ModeFilter>(params.get('mode'), VALID_MODES, ''),
+    price: validateEnum<PriceFilter>(params.get('price'), VALID_PRICES, ''),
     open: params.get('open') === '1',
     past: params.get('past') === '1',
-    sort: (['soonest', 'price-asc', 'seats', 'deadline'].includes(sort) ? sort : 'soonest') as SortKey,
+    sort: validateEnum<SortKey>(params.get('sort'), VALID_SORTS, 'soonest'),
     view: params.get('view') === 'list' ? 'list' : 'grid',
   }
 }
@@ -145,8 +160,9 @@ export interface FilterChip {
 export function getActiveChips(filters: EventFilters): FilterChip[] {
   const chips: FilterChip[] = []
   if (filters.q) chips.push({ key: 'q', label: `"${filters.q}"` })
+  // FIX: cultural chip must use key 'kind' (same as technical) so removeChip({ kind: '' }) clears it
   if (filters.kind === 'technical') chips.push({ key: 'kind', label: 'Technical' })
-  if (filters.kind === 'cultural') chips.push({ key: 'cultural', label: 'Cultural' })
+  if (filters.kind === 'cultural') chips.push({ key: 'kind', label: 'Cultural' })
   if (filters.type === 'event') chips.push({ key: 'type', label: 'Events' })
   if (filters.type === 'workshop') chips.push({ key: 'type', label: 'Workshops' })
   if (filters.mode === 'online') chips.push({ key: 'mode', label: 'Online' })
