@@ -1,0 +1,33 @@
+/* Route transition bar */
+#route-transition {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: var(--vermilion);
+  z-index: 9999;
+  transition: none;
+  pointer-events: none;
+}
+
+#route-transition[data-active='true'] {
+  animation: route-bar var(--dur, 240ms) var(--ease, cubic-bezier(0.2, 0.7, 0.1, 1)) forwards;
+}
+
+@keyframes route-bar {
+  0%   { width: 0%; opacity: 1; }
+  80%  { width: 85%; opacity: 1; }
+  100% { width: 100%; opacity: 0; }
+}
+
+/* Page fallback skeleton grid */
+.app-page-fallback {
+  padding-block: 3rem;
+}
+
+.app-page-fallback__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 1.5rem;
+}

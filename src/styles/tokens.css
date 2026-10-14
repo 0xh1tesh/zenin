@@ -1,0 +1,61 @@
+@import '@fontsource-variable/fraunces/index.css';
+@import '@fontsource-variable/inter-tight/index.css';
+@import '@fontsource/jetbrains-mono/400.css';
+
+:root {
+  /* Surface */
+  --paper: #f4efe4;
+  --paper-2: #ebe4d3;
+  --card: #fbf8f1;
+  --ink: #15120f;
+  --ink-2: #4a443b;
+  --ink-3: #6b6458;
+  --line: #15120f1f;
+  --line-strong: #15120f;
+
+  /* Accents */
+  --vermilion: #d93a12;
+  --vermilion-ink: #a82b08;
+  --cobalt: #2236d6;
+  --saffron: #f2b01e;
+  --moss: #2f6b3b;
+
+  /* Status */
+  --ok: #1f6b34;
+  --warn: #8a5a00;
+  --bad: #a82b08;
+
+  /* Type */
+  --font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'Inter Tight Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+
+  /* Scale */
+  --step--1: clamp(0.8rem, 0.78rem + 0.1vw, 0.875rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --step-1: clamp(1.25rem, 1.15rem + 0.5vw, 1.55rem);
+  --step-2: clamp(1.6rem, 1.4rem + 1vw, 2.2rem);
+  --step-3: clamp(2.2rem, 1.7rem + 2.5vw, 3.8rem);
+  --step-4: clamp(3rem, 2rem + 5vw, 7rem);
+
+  /* Space / shape */
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --maxw: 80rem;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 0 var(--line), 0 12px 32px -18px #15120f40;
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --dur: 240ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur: 0.01ms; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://render72.pages.dev/sitemap.xml
