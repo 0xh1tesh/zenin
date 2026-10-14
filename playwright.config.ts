@@ -9,14 +9,15 @@ export default defineConfig({
   retries: 0,
   reporter: [['list']],
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:4173',
     trace: 'retain-on-failure',
   },
   projects: [{ name: 'desktop', use: { ...devices['Desktop Chrome'], channel } }],
+  // Tests run against the production bundle, the code that actually ships.
   webServer: {
-    command: 'npm run dev -- --port 5173 --strictPort',
-    url: 'http://localhost:5173',
+    command: 'npx vite build && npx vite preview --port 4173 --strictPort',
+    url: 'http://localhost:4173',
     reuseExistingServer: true,
-    timeout: 60_000,
+    timeout: 180_000,
   },
 })
