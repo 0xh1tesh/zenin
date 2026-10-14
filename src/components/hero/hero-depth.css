@@ -8,10 +8,17 @@
 
 @media (max-width: 640px) {
   .hero__stage {
-    --pw: 70vw;
-    --pbottom: -16%;
-    --os: 150vw;
+    --pw: 88vw;
+    /* lift the planet clear of the fixed bottom navigation */
+    --pbottom: calc(var(--bottomnav-h) - 20%);
+    --os: 170vw;
   }
+}
+
+/* Planet position comes from the variables so planet and orbits always share a centre */
+.hero__planet-wrap {
+  width: var(--pw);
+  bottom: var(--pbottom);
 }
 
 /* Dive layers scale around the bottom centre of the stage */
@@ -83,8 +90,23 @@
   letter-spacing: 0.05em;
 }
 
+/* Soft dark scrim keeps the copy readable while the planet swells behind it */
+.hero__overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse 52% 42% at 50% 36%, rgb(16 16 16 / 0.62), transparent 72%);
+  pointer-events: none;
+}
+
 .hero__tagline {
-  text-shadow: 0 1px 12px rgb(16 16 16 / 0.8);
+  color: var(--bone);
+  text-shadow: 0 1px 14px rgb(16 16 16 / 0.9);
+}
+
+.hero__h1-year {
+  text-shadow: 0 2px 18px rgb(16 16 16 / 0.7);
 }
 
 .hero__next-name {
