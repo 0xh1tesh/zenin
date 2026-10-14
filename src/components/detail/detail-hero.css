@@ -3,8 +3,9 @@
   position: relative;
   width: 100%;
   overflow: hidden;
-  /* Aspect ratio space-reserve prevents CLS before image loads */
+  /* Aspect ratio reserve prevents CLS before image loads */
   aspect-ratio: 16 / 9;
+  min-height: clamp(24rem, 50vw, 38rem);
   background: var(--void-2);
 }
 
@@ -14,21 +15,20 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 30%;
-  /* Prevent img from causing layout-reflow */
+  object-position: center 35%;
   display: block;
 }
 
-/* Dark scrim: gradient from bottom, so title stays readable */
+/* Dark scrim: gradient from bottom and top so text & back button stay crisp */
 .detail-hero__scrim {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgb(16 16 16 / 0) 0%,
-    rgb(16 16 16 / 0.25) 35%,
-    rgb(16 16 16 / 0.72) 65%,
-    rgb(16 16 16 / 0.94) 100%
+    rgb(16 16 16 / 0.7) 0%,
+    rgb(16 16 16 / 0.2) 25%,
+    rgb(16 16 16 / 0.65) 60%,
+    rgb(16 16 16 / 0.96) 100%
   );
   pointer-events: none;
 }
@@ -45,15 +45,54 @@
 
 .detail-hero__content {
   position: absolute;
-  inset: auto 0 0;
-  padding: clamp(1.5rem, 4vw, 3rem) var(--gutter);
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: calc(var(--topbar-h) + 1.25rem) var(--gutter) clamp(1.75rem, 4vw, 3rem);
+  max-width: var(--maxw);
+  margin-inline: auto;
 }
 
-/* On desktop, shift right by rail width */
+/* On desktop, clear left rail */
 @media (min-width: 1024px) {
   .detail-hero__content {
     padding-left: calc(var(--gutter) + var(--rail-w));
   }
+}
+
+.detail-hero__top-bar {
+  margin-bottom: auto;
+  padding-bottom: 1rem;
+}
+
+.detail-hero__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sand);
+  text-decoration: none;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: rgb(16 16 16 / 0.6);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+  transition:
+    color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    background-color var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+.detail-hero__back:hover {
+  color: var(--coral);
+  border-color: var(--coral);
+  transform: translateX(-2px);
 }
 
 .detail-hero__eyebrow {
@@ -65,50 +104,47 @@
 }
 
 .detail-hero__category {
-  font: 600 0.6875rem/1 var(--font-mono);
+  font: 600 0.75rem/1 var(--font-mono);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--coral);
 }
 
 .detail-hero__tag {
-  padding: 0.2rem 0.55rem;
+  padding: 0.25rem 0.6rem;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
-  font: 500 0.625rem/1 var(--font-mono);
-  letter-spacing: 0.1em;
+  font: 500 0.6875rem/1 var(--font-mono);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
   background: rgb(16 16 16 / 0.55);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
 }
 
 .detail-hero__title {
-  font: 800 clamp(1.6rem, 4.5vw, 3.5rem) / 1.05 var(--font-display);
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 5vw, 3.75rem);
+  font-weight: 800;
+  line-height: 1.05;
   letter-spacing: -0.03em;
   color: var(--sand);
-  max-width: 18ch;
+  max-width: 22ch;
   text-wrap: balance;
-  margin: 0 0 1rem;
+  margin: 0 0 1.25rem;
+  text-shadow: 0 2px 20px rgb(0 0 0 / 0.7);
 }
 
 .detail-hero__sub {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.6rem 1.2rem;
-}
-
-.detail-hero__badge-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem 1.4rem;
 }
 
 .detail-hero__date {
-  font: 500 0.75rem/1 var(--font-mono);
-  letter-spacing: 0.08em;
+  font: 500 0.8125rem/1.2 var(--font-mono);
+  letter-spacing: 0.06em;
   font-variant-numeric: tabular-nums;
   color: var(--bone);
 }
@@ -116,25 +152,26 @@
 .detail-hero__venue {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  font: 500 0.75rem/1 var(--font-mono);
+  gap: 0.4rem;
+  font: 500 0.8125rem/1.2 var(--font-mono);
   letter-spacing: 0.06em;
-  color: var(--muted);
+  color: var(--sand);
 }
 
 .detail-hero__venue-icon {
   flex-shrink: 0;
-  width: 0.9rem;
-  height: 0.9rem;
+  width: 1rem;
+  height: 1rem;
   color: var(--coral);
 }
 
-/* Hero skeleton: matches final layout ratio */
+/* ─── Hero Skeleton ───────────────────────────────────────────────────── */
 .detail-hero-skel {
-  aspect-ratio: 16 / 9;
-  width: 100%;
-  background: var(--void-2);
   position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: clamp(24rem, 50vw, 38rem);
+  background: var(--void-2);
   overflow: hidden;
 }
 
@@ -143,17 +180,54 @@
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgb(230 213 189 / 0.06), transparent);
-  animation: ui-shimmer 1.4s infinite;
+  background: linear-gradient(90deg, transparent, rgb(230 213 189 / 0.08), transparent);
+  animation: ui-shimmer 1.5s infinite;
 }
 
 .detail-hero-skel__content {
   position: absolute;
-  inset: auto var(--gutter) clamp(1.5rem, 4vw, 3rem);
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: calc(var(--topbar-h) + 1.25rem) var(--gutter) clamp(1.75rem, 4vw, 3rem);
+  max-width: var(--maxw);
+  margin-inline: auto;
 }
 
 @media (min-width: 1024px) {
   .detail-hero-skel__content {
-    left: calc(var(--gutter) + var(--rail-w));
+    padding-left: calc(var(--gutter) + var(--rail-w));
   }
+}
+
+.detail-hero-skel__back {
+  width: 9rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: var(--void-3);
+  margin-bottom: auto;
+}
+
+.detail-hero-skel__eyebrow {
+  width: 14rem;
+  height: 1.25rem;
+  border-radius: 4px;
+  background: var(--void-3);
+  margin-bottom: 1rem;
+}
+
+.detail-hero-skel__title {
+  width: min(90%, 34rem);
+  height: clamp(2.5rem, 6vw, 4rem);
+  border-radius: 6px;
+  background: var(--void-3);
+  margin-bottom: 1.25rem;
+}
+
+.detail-hero-skel__sub {
+  width: min(80%, 20rem);
+  height: 1.5rem;
+  border-radius: 4px;
+  background: var(--void-3);
 }

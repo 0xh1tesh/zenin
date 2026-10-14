@@ -8,7 +8,7 @@ import EventCard from '../EventCard'
 import { Skeleton } from '../ui/Skeleton'
 import './home.css'
 
-interface FieldFlightProps {
+export interface FieldFlightProps {
   events: EventSummary[] | null
 }
 
@@ -30,6 +30,7 @@ function StagedCover({ event, index }: StagedCoverProps) {
         className="field__slide-link"
         to={`/events/${event.id}`}
         tabIndex={index !== 0 ? -1 : undefined}
+        aria-label={`View featured event: ${event.name}`}
       >
         <div className="field__img-wrap">
           {image ? (
@@ -67,8 +68,7 @@ export default function FieldFlight({ events }: FieldFlightProps) {
     typeof window !== 'undefined' ? window.innerWidth >= 1024 : false,
   )
 
-  // Track viewport size for render decision (no layout shift — desktop starts server-side false so
-  // we always SSR the mobile rail, then upgrade on mount)
+  // Track viewport size for render decision
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)')
     const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
@@ -86,45 +86,44 @@ export default function FieldFlight({ events }: FieldFlightProps) {
     let cleanup: (() => void) | undefined
 
     const init = () => {
-      loadGsap().then(({ gsap, ScrollTrigger }) => {
+      loadGsap().then(({ gsap }) => {
         const slides = Array.from(stage.querySelectorAll<HTMLElement>('.field__slide'))
         if (slides.length === 0) return
 
-        gsap.set(slides, { transformPerspective: 1200 })
+        const ctx = gsap.context(() => {
+          gsap.set(slides, { transformPerspective: 1200 })
 
-        // Each slide starts deep (positive z = away from viewer in CSS 3D)
-        gsap.set(slides, (i: number) => ({
-          z: i === 0 ? 0 : 900 + i * 300,
-          opacity: i === 0 ? 1 : 0,
-          scale: i === 0 ? 1 : 0.72,
-        }))
+          // Each slide starts deep (positive z = away from viewer in CSS 3D)
+          gsap.set(slides, (i: number) => ({
+            z: i === 0 ? 0 : 900 + i * 300,
+            opacity: i === 0 ? 1 : 0,
+            scale: i === 0 ? 1 : 0.72,
+          }))
 
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: stage,
-            start: 'top top',
-            end: `+=${slides.length * 120}%`,
-            scrub: 1.2,
-            pin: true,
-            anticipatePin: 1,
-          },
-        })
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: stage,
+              start: 'top top',
+              end: `+=${slides.length * 120}%`,
+              scrub: 1.2,
+              pin: true,
+              anticipatePin: 1,
+            },
+          })
 
-        slides.forEach((slide, i) => {
-          if (i === 0) return
-          const prev = slides[i - 1]
-          tl.to(prev, { z: -600, opacity: 0, scale: 0.82, duration: 1 }, i - 1)
-          tl.to(slide, { z: 0, opacity: 1, scale: 1, duration: 1 }, i - 1)
-          // expose tab access for the visible slide
-          tl.call(() => {
-            slides.forEach((s, j) => s.setAttribute('aria-hidden', String(j !== i)))
-          }, [], i - 0.5)
-        })
+          slides.forEach((slide, i) => {
+            if (i === 0) return
+            const prev = slides[i - 1]
+            tl.to(prev, { z: -600, opacity: 0, scale: 0.82, duration: 1 }, i - 1)
+            tl.to(slide, { z: 0, opacity: 1, scale: 1, duration: 1 }, i - 1)
+            // expose tab access for the visible slide
+            tl.call(() => {
+              slides.forEach((s, j) => s.setAttribute('aria-hidden', String(j !== i)))
+            }, [], i - 0.5)
+          })
+        }, stage)
 
-        cleanup = () => {
-          ScrollTrigger.getAll().forEach((st) => st.kill())
-          tl.kill()
-        }
+        cleanup = () => ctx.revert()
       })
     }
 
@@ -144,10 +143,15 @@ export default function FieldFlight({ events }: FieldFlightProps) {
     return (
       <section className="field section" aria-label="Featured events loading">
         <div className="container">
-          <p className="eyebrow field__eyebrow">02 — Through the field</p>
-          <div className="field__rail">
+          <div className="field__header">
+            <p className="eyebrow field__eyebrow">02 — Through the field</p>
+            <h2 className="field__heading">Selected trajectory</h2>
+          </div>
+          <div className="field__rail" role="status" aria-label="Loading featured events">
             {Array.from({ length: 3 }, (_, i) => (
-              <Skeleton key={i} className="field__skel" />
+              <div key={i} className="field__rail-item">
+                <Skeleton className="field__skel" />
+              </div>
             ))}
           </div>
         </div>
@@ -163,10 +167,13 @@ export default function FieldFlight({ events }: FieldFlightProps) {
 
   return (
     <section className="field section" aria-label="Featured events">
-      <div className={useStage ? undefined : 'container'}>
-        <p className={`eyebrow field__eyebrow${useStage ? ' field__eyebrow--stage' : ''}`}>
-          02 — Through the field
-        </p>
+      <div className={useStage ? 'field__header-stage' : 'container'}>
+        <div className="field__header">
+          <p className={`eyebrow field__eyebrow${useStage ? ' field__eyebrow--stage' : ''}`}>
+            02 — Through the field
+          </p>
+          <h2 className="field__heading">Selected trajectory</h2>
+        </div>
       </div>
 
       {useStage ? (

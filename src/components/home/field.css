@@ -1,0 +1,169 @@
+/* ─── Through the field (Section 02) ──────────────────────────────────── */
+.field {
+  border-top: 1px solid var(--line);
+  position: relative;
+  background: var(--void);
+}
+
+.field__header {
+  margin-bottom: 2.5rem;
+}
+
+.field__header-stage {
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  padding-left: calc(var(--gutter) + var(--rail-w));
+}
+
+.field__eyebrow {
+  margin-bottom: 0.5rem;
+}
+
+.field__heading {
+  font-size: var(--step-2);
+  color: var(--sand);
+  letter-spacing: -0.02em;
+}
+
+/* ─── 3D Pinned Stage (Desktop ≥1024px) ─────────────────────────────────── */
+.field__stage {
+  position: relative;
+  width: 100%;
+  height: 90vh;
+  min-height: 580px;
+  max-height: 850px;
+  perspective: 1200px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.field__scene {
+  position: relative;
+  width: min(860px, 75vw);
+  height: min(540px, 60vh);
+  transform-style: preserve-3d;
+}
+
+.field__slide {
+  position: absolute;
+  inset: 0;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+.field__slide-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  background: var(--void-2);
+  box-shadow: 0 25px 60px -15px rgb(0 0 0 / 0.8);
+  transition: border-color var(--dur) var(--ease);
+}
+
+.field__slide-link:hover {
+  border-color: var(--coral);
+}
+
+.field__img-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.field__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 600ms var(--ease);
+}
+
+.field__slide-link:hover .field__img {
+  transform: scale(1.04);
+}
+
+.field__img-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--void-3);
+}
+
+.field__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(16 16 16 / 0.2) 0%,
+    rgb(16 16 16 / 0.6) 50%,
+    rgb(16 16 16 / 0.95) 100%
+  );
+}
+
+.field__info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2.5rem;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field__cat {
+  color: var(--coral);
+}
+
+.field__title {
+  font-size: var(--step-2);
+  color: var(--sand);
+  line-height: 1.15;
+}
+
+.field__date {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* ─── Mobile / Tablet Horizontal Rail ─────────────────────────────────── */
+.field__rail {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 1.5rem;
+  margin-inline: calc(-1 * var(--gutter));
+  padding-inline: var(--gutter);
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+.field__rail::-webkit-scrollbar {
+  height: 4px;
+}
+.field__rail::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 999px;
+}
+
+.field__rail-item {
+  flex: 0 0 84vw;
+  max-width: 440px;
+  scroll-snap-align: start;
+}
+
+.field__skel {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius);
+}

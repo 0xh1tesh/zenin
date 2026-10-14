@@ -1,0 +1,181 @@
+/* ─── Browse the sky (Section 04) ──────────────────────────────────────── */
+.browse {
+  border-top: 1px solid var(--line);
+  position: relative;
+  background: var(--void);
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 640px;
+}
+
+.browse__header {
+  margin-bottom: 2.5rem;
+}
+
+.browse__eyebrow {
+  margin-bottom: 0.5rem;
+}
+
+.browse__heading {
+  font-size: var(--step-2);
+  color: var(--sand);
+  letter-spacing: -0.02em;
+}
+
+.browse__subhead {
+  margin-top: 0.6rem;
+  color: var(--muted);
+  max-width: 50ch;
+  font-size: 0.95rem;
+}
+
+.browse__grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1.5rem;
+}
+
+/* Bento arrangement */
+.browse__col--technical {
+  grid-column: span 6;
+}
+
+.browse__col--cultural {
+  grid-column: span 6;
+}
+
+.browse__col--workshops {
+  grid-column: span 6;
+}
+
+.browse__col--online {
+  grid-column: span 6;
+}
+
+.browse__col--free {
+  grid-column: span 6;
+}
+
+@media (min-width: 768px) {
+  .browse__col--technical {
+    grid-column: span 3;
+  }
+  .browse__col--cultural {
+    grid-column: span 3;
+  }
+  .browse__col--workshops {
+    grid-column: span 2;
+  }
+  .browse__col--online {
+    grid-column: span 2;
+  }
+  .browse__col--free {
+    grid-column: span 2;
+  }
+}
+
+.browse-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 220px;
+  padding: 1.75rem;
+  background: var(--void-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.browse-tile::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle at 100% 0%, rgb(239 133 87 / 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.browse-tile:hover {
+  transform: translateY(-4px);
+  border-color: var(--coral);
+  box-shadow: 0 16px 36px -12px rgb(239 133 87 / 0.15);
+}
+
+.browse-tile:hover::after {
+  opacity: 1;
+}
+
+.browse-tile__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.browse-tile__code {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: var(--coral);
+}
+
+.browse-tile__count {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--sand);
+  background: rgb(230 213 189 / 0.08);
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+}
+
+.browse-tile__skel {
+  width: 50px;
+  height: 1rem;
+}
+
+.browse-tile__body {
+  margin-bottom: 1.5rem;
+}
+
+.browse-tile__title {
+  font-size: var(--step-1);
+  color: var(--sand);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
+}
+
+.browse-tile__tagline {
+  font-size: 0.875rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.browse-tile__footer {
+  margin-top: auto;
+}
+
+.browse-tile__cta {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  color: var(--bone);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.browse-tile:hover .browse-tile__cta {
+  color: var(--coral);
+  transform: translateX(4px);
+}

@@ -1,0 +1,57 @@
+/* ─── Schedule Section ────────────────────────────────────────────────── */
+.detail-schedule__list {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.detail-schedule__card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem 1.25rem;
+  background: var(--void-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--coral);
+  border-radius: var(--radius-sm);
+}
+
+.detail-schedule__time-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detail-schedule__date {
+  font: 700 0.95rem var(--font-mono);
+  color: var(--sand);
+}
+
+.detail-schedule__time {
+  font: 500 0.8125rem var(--font-mono);
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.detail-schedule__venue {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font: 500 0.875rem var(--font-mono);
+  color: var(--bone);
+  background: rgb(16 16 16 / 0.5);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+}
+
+.detail-schedule__venue-icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--coral);
+}

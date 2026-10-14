@@ -3,9 +3,10 @@ import { prefersReducedMotion } from '../../lib/motion'
 import type { EventSummary } from '../../types'
 import { daysToNext } from './helpers'
 import { registrationState } from '../ui/StatusBadge'
+import { Skeleton } from '../ui/Skeleton'
 import './home.css'
 
-interface SignalStripProps {
+export interface SignalStripProps {
   events: EventSummary[] | null
 }
 
@@ -66,8 +67,14 @@ function StatCell({ value, label, suffix, index, active }: StatCellProps) {
   return (
     <div className="signal__stat" style={{ '--idx': index } as React.CSSProperties}>
       <span className="signal__num" aria-live="polite" aria-atomic="true">
-        {displayed !== null ? displayed : '—'}
-        {suffix && displayed !== null && <span className="signal__suffix">{suffix}</span>}
+        {value === null ? (
+          <Skeleton className="signal__skel" />
+        ) : (
+          <>
+            {displayed !== null ? displayed : '—'}
+            {suffix && displayed !== null && <span className="signal__suffix">{suffix}</span>}
+          </>
+        )}
       </span>
       <span className="signal__label mono">{label}</span>
     </div>
@@ -109,7 +116,10 @@ export default function SignalStrip({ events }: SignalStripProps) {
   return (
     <section ref={ref} className="signal section" aria-label="Programme statistics">
       <div className="container">
-        <p className="eyebrow signal__eyebrow">01 — Signal</p>
+        <div className="signal__header">
+          <p className="eyebrow signal__eyebrow">01 — Signal</p>
+          <h2 className="signal__heading">Telemetry at a glance</h2>
+        </div>
         <div className="signal__grid">
           {stats.map((s, i) => (
             <StatCell
