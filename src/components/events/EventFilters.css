@@ -193,7 +193,28 @@
   align-items: center;
   gap: 0.5rem;
   margin-left: auto;
-  flex-shrink: 0;
+  min-width: 0;
+}
+
+/* Phones: the sort control absorbs the slack so the row never exceeds the screen */
+@media (max-width: 767px) {
+  .events-bar-controls {
+    flex: 1;
+  }
+
+  .events-sort-wrap {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .events-sort-select {
+    width: 100%;
+  }
+
+  .events-view-toggle,
+  .events-filter-mobile-btn {
+    flex-shrink: 0;
+  }
 }
 
 /* Sort select */
