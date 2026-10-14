@@ -1,0 +1,159 @@
+/* ─── Detail Hero ─────────────────────────────────────────────────────── */
+.detail-hero {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  /* Aspect ratio space-reserve prevents CLS before image loads */
+  aspect-ratio: 16 / 9;
+  background: var(--void-2);
+}
+
+.detail-hero__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  /* Prevent img from causing layout-reflow */
+  display: block;
+}
+
+/* Dark scrim: gradient from bottom, so title stays readable */
+.detail-hero__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgb(16 16 16 / 0) 0%,
+    rgb(16 16 16 / 0.25) 35%,
+    rgb(16 16 16 / 0.72) 65%,
+    rgb(16 16 16 / 0.94) 100%
+  );
+  pointer-events: none;
+}
+
+/* Hairline sand rule along the bottom of the hero */
+.detail-hero::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: var(--line-strong);
+  pointer-events: none;
+}
+
+.detail-hero__content {
+  position: absolute;
+  inset: auto 0 0;
+  padding: clamp(1.5rem, 4vw, 3rem) var(--gutter);
+}
+
+/* On desktop, shift right by rail width */
+@media (min-width: 1024px) {
+  .detail-hero__content {
+    padding-left: calc(var(--gutter) + var(--rail-w));
+  }
+}
+
+.detail-hero__eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.8rem;
+  margin-bottom: 0.75rem;
+}
+
+.detail-hero__category {
+  font: 600 0.6875rem/1 var(--font-mono);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--coral);
+}
+
+.detail-hero__tag {
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  font: 500 0.625rem/1 var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: rgb(16 16 16 / 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.detail-hero__title {
+  font: 800 clamp(1.6rem, 4.5vw, 3.5rem) / 1.05 var(--font-display);
+  letter-spacing: -0.03em;
+  color: var(--sand);
+  max-width: 18ch;
+  text-wrap: balance;
+  margin: 0 0 1rem;
+}
+
+.detail-hero__sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1.2rem;
+}
+
+.detail-hero__badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.detail-hero__date {
+  font: 500 0.75rem/1 var(--font-mono);
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: var(--bone);
+}
+
+.detail-hero__venue {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font: 500 0.75rem/1 var(--font-mono);
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.detail-hero__venue-icon {
+  flex-shrink: 0;
+  width: 0.9rem;
+  height: 0.9rem;
+  color: var(--coral);
+}
+
+/* Hero skeleton: matches final layout ratio */
+.detail-hero-skel {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  background: var(--void-2);
+  position: relative;
+  overflow: hidden;
+}
+
+.detail-hero-skel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgb(230 213 189 / 0.06), transparent);
+  animation: ui-shimmer 1.4s infinite;
+}
+
+.detail-hero-skel__content {
+  position: absolute;
+  inset: auto var(--gutter) clamp(1.5rem, 4vw, 3rem);
+}
+
+@media (min-width: 1024px) {
+  .detail-hero-skel__content {
+    left: calc(var(--gutter) + var(--rail-w));
+  }
+}

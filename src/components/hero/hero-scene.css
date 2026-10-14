@@ -1,0 +1,251 @@
+/* ─── Hero scroll track & sticky stage ─────────────────────────────── */
+.hero {
+  position: relative;
+  height: 300svh;
+  /* Guarantee the section is a stacking context */
+  z-index: 0;
+}
+
+@media (max-width: 640px) {
+  .hero {
+    height: 190svh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero {
+    height: 100svh;
+  }
+}
+
+.hero__stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  background: var(--void);
+}
+
+/* ─── Layer ordering (z-index inside stage) ────────────────────────── */
+.hero__stars    { z-index: 0; }
+.hero__nebula   { z-index: 1; }
+.hero__planet   { z-index: 2; }
+.hero__orbits   { z-index: 3; }
+.hero__title    { z-index: 4; }
+.hero__ridge    { z-index: 5; }
+.hero__fog      { z-index: 6; }
+.hero__overlay  { z-index: 7; }
+
+/* All scene layers are absolutely positioned to fill the stage */
+.hero__stars,
+.hero__nebula,
+.hero__planet,
+.hero__orbits,
+.hero__title,
+.hero__ridge,
+.hero__fog {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* ─── L0: Star canvas ──────────────────────────────────────────────── */
+.hero__stars canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ─── L1: Nebula haze (radial gradients, NOT filter:blur) ──────────── */
+.hero__nebula {
+  opacity: 0.35;
+}
+
+.hero__nebula-blue {
+  position: absolute;
+  width: 120%;
+  height: 120%;
+  top: -20%;
+  left: -30%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at 30% 40%,
+    var(--blue) 0%,
+    transparent 70%
+  );
+}
+
+.hero__nebula-vermilion {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 10%;
+  right: -20%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at 70% 60%,
+    var(--vermilion) 0%,
+    transparent 65%
+  );
+}
+
+/* ─── L2: Planet ───────────────────────────────────────────────────── */
+.hero__planet {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.hero__planet-wrap {
+  position: absolute;
+  bottom: -8%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(38vw, 24rem);
+  aspect-ratio: 1;
+  will-change: transform;
+}
+
+@media (max-width: 640px) {
+  .hero__planet-wrap {
+    width: 70vw;
+    bottom: -16%;
+  }
+}
+
+.hero__planet-sphere {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    #ff6a3a 0%,
+    var(--vermilion) 40%,
+    #7a1c04 75%,
+    #2a0a02 100%
+  );
+  position: relative;
+  overflow: hidden;
+}
+
+/* Limb glow */
+.hero__planet-sphere::before {
+  content: '';
+  position: absolute;
+  inset: -6%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    transparent 45%,
+    rgba(239, 133, 87, 0.3) 60%,
+    transparent 70%
+  );
+}
+
+/* Terminator shadow */
+.hero__planet-sphere::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(
+    120deg,
+    transparent 40%,
+    rgba(16, 16, 16, 0.85) 65%,
+    rgba(16, 16, 16, 0.98) 100%
+  );
+}
+
+/* ─── Planet ring (SVG, positioned in Planet.tsx) ───────────────────── */
+.hero__ring-svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 180%;
+  height: 60%;
+  transform: translate(-50%, -50%);
+  overflow: visible;
+}
+
+.hero__ring-back,
+.hero__ring-front {
+  fill: none;
+  stroke: var(--sand);
+  stroke-width: 1.2;
+  opacity: 0.4;
+}
+
+.hero__ring-front {
+  opacity: 0.55;
+}
+
+/* ─── L3: Orbit lines (SVG) ────────────────────────────────────────── */
+.hero__orbits svg {
+  width: 100%;
+  height: 100%;
+}
+
+.hero__orbit-line {
+  fill: none;
+  stroke: var(--sand);
+  stroke-width: 0.7;
+  stroke-dasharray: 6 10;
+  opacity: 0.18;
+}
+
+.hero__moon {
+  fill: var(--sand);
+  opacity: 0.7;
+}
+
+/* ─── L5: Foreground ridge silhouettes ─────────────────────────────── */
+.hero__ridge {
+  bottom: 0;
+  top: auto;
+  height: 28%;
+  will-change: transform, opacity;
+}
+
+.hero__ridge svg {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hero__ridge-fill {
+  fill: var(--void-2);
+}
+
+.hero__ridge-rim {
+  fill: none;
+  stroke: var(--coral);
+  stroke-width: 1.2;
+  opacity: 0.5;
+}
+
+/* ─── L6: Fog / dust gradient wipe ─────────────────────────────────── */
+.hero__fog {
+  top: auto;
+  bottom: 0;
+  height: 45%;
+  background: linear-gradient(
+    to top,
+    var(--void) 0%,
+    var(--void) 15%,
+    rgba(16, 16, 16, 0.7) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  will-change: opacity;
+}
+
+@media (max-width: 640px) {
+  .hero__ridge {
+    height: 22%;
+  }
+  .hero__fog {
+    height: 50%;
+  }
+}

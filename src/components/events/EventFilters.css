@@ -1,1 +1,587 @@
-/* Styles for the filter bar are written by the events worker (see docs/SPEC.md). */
+/* ─── EventFilters.css — cosmic mission-control filter bar ─────────────── */
+/* Class prefix: .events- (per SPEC §2) */
+
+/* ─── Sticky filter bar ────────────────────────────────────────────────── */
+.events-filter-bar {
+  position: sticky;
+  top: var(--topbar-h);
+  z-index: 40;
+  background: rgb(16 16 16 / 0.88);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+}
+
+.events-filter-bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-block: 0.55rem;
+}
+
+/* Desktop filter row: visible at md+ */
+.events-filter-bar-desktop {
+  display: none;
+  flex: 1;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .events-filter-bar-desktop {
+    display: block;
+  }
+}
+
+/* ─── Filter row (chips + search) ──────────────────────────────────────── */
+.events-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+/* ─── Search ────────────────────────────────────────────────────────────── */
+.events-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: min(100%, 14rem);
+  max-width: 22rem;
+}
+
+.events-search-icon {
+  position: absolute;
+  left: 0.7rem;
+  font-size: 1.15rem;
+  color: var(--muted);
+  pointer-events: none;
+  line-height: 1;
+}
+
+.events-search {
+  width: 100%;
+  padding: 0.45rem 2.2rem 0.45rem 2rem;
+  background: var(--void-3);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--bone);
+  font-size: var(--step--1);
+  font-family: var(--font-body);
+  transition:
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+  appearance: none;
+}
+
+.events-search::placeholder {
+  color: var(--muted);
+}
+
+.events-search:focus {
+  outline: none;
+  border-color: var(--coral);
+  box-shadow: 0 0 0 3px rgb(239 133 87 / 0.18);
+}
+
+/* Remove browser's default clear button */
+.events-search::-webkit-search-cancel-button {
+  display: none;
+}
+
+.events-search-clear {
+  position: absolute;
+  right: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--void-3);
+  color: var(--muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease);
+}
+
+.events-search-clear:hover {
+  color: var(--bone);
+  background: var(--line-strong);
+}
+
+/* ─── Chip groups ────────────────────────────────────────────────────────── */
+.events-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.events-chip-legend {
+  display: none; /* legend is visually hidden but stays in DOM for a11y */
+}
+
+@media (min-width: 768px) {
+  .events-chip-legend {
+    display: block;
+    font: 500 0.6rem/1 var(--font-mono);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 0.1rem;
+  }
+}
+
+/* ─── Toggle chips ───────────────────────────────────────────────────────── */
+.events-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2rem;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: 600 0.6875rem/1 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    background-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.events-chip:hover {
+  color: var(--bone);
+  border-color: rgb(230 213 189 / 0.5);
+}
+
+.events-chip:focus-visible {
+  outline: 2px solid var(--coral);
+  outline-offset: 2px;
+}
+
+.events-chip--active {
+  background: rgb(239 133 87 / 0.14);
+  border-color: var(--coral);
+  color: var(--coral);
+  box-shadow: 0 0 10px -2px rgb(239 133 87 / 0.25);
+}
+
+.events-chip--active:hover {
+  background: rgb(239 133 87 / 0.22);
+  color: var(--coral);
+}
+
+/* Boolean chip group (no legend needed) */
+.events-chip-group--bools {
+  gap: 0.4rem;
+}
+
+/* ─── Sort + view controls ──────────────────────────────────────────────── */
+.events-bar-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Sort select */
+.events-sort-wrap {
+  position: relative;
+}
+
+.events-sort-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.events-sort-select {
+  padding: 0.4rem 1.8rem 0.4rem 0.7rem;
+  background: var(--void-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--bone);
+  font: 600 0.6875rem/1 var(--font-mono);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239C958A' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.55rem center;
+  min-height: 2rem;
+  transition:
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.events-sort-select:focus {
+  outline: none;
+  border-color: var(--coral);
+  box-shadow: 0 0 0 3px rgb(239 133 87 / 0.18);
+}
+
+/* ─── View toggle ─────────────────────────────────────────────────────────── */
+.events-view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.2rem;
+  background: var(--void-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.events-view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.6rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    color var(--dur) var(--ease),
+    background-color var(--dur) var(--ease);
+}
+
+.events-view-btn:hover {
+  color: var(--bone);
+}
+
+.events-view-btn:focus-visible {
+  outline: 2px solid var(--coral);
+  outline-offset: 1px;
+}
+
+.events-view-btn--active {
+  background: rgb(239 133 87 / 0.12);
+  color: var(--coral);
+}
+
+/* ─── Mobile filter button ──────────────────────────────────────────────── */
+.events-filter-mobile-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2rem;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--void-3);
+  color: var(--bone);
+  font: 600 0.6875rem/1 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color var(--dur) var(--ease),
+    background-color var(--dur) var(--ease);
+}
+
+.events-filter-mobile-btn:hover {
+  border-color: var(--coral);
+  color: var(--coral);
+}
+
+.events-filter-mobile-btn:focus-visible {
+  outline: 2px solid var(--coral);
+  outline-offset: 2px;
+}
+
+@media (min-width: 768px) {
+  .events-filter-mobile-btn {
+    display: none;
+  }
+}
+
+.events-filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding-inline: 0.25rem;
+  border-radius: 999px;
+  background: var(--coral);
+  color: var(--void);
+  font: 700 0.625rem/1 var(--font-mono);
+}
+
+/* ─── Active chip strip ─────────────────────────────────────────────────── */
+.events-active-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  padding-block: 0.45rem;
+  border-top: 1px solid var(--line);
+}
+
+.events-active-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 1.75rem;
+  padding: 0.25rem 0.6rem 0.25rem 0.75rem;
+  border: 1px solid rgb(239 133 87 / 0.5);
+  border-radius: 999px;
+  background: rgb(239 133 87 / 0.1);
+  color: var(--coral);
+  font: 600 0.625rem/1 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+
+.events-active-chip:hover {
+  background: rgb(239 133 87 / 0.2);
+  border-color: var(--coral);
+}
+
+.events-active-chip:focus-visible {
+  outline: 2px solid var(--coral);
+  outline-offset: 2px;
+}
+
+.events-active-chip-x {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: rgb(239 133 87 / 0.2);
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.events-clear-all {
+  min-height: 1.75rem;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: 600 0.625rem/1 var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-left: auto;
+  white-space: nowrap;
+  transition:
+    color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+.events-clear-all:hover {
+  color: var(--bone);
+  border-color: rgb(230 213 189 / 0.5);
+}
+
+.events-clear-all:focus-visible {
+  outline: 2px solid var(--coral);
+  outline-offset: 2px;
+}
+
+/* ─── Result count ──────────────────────────────────────────────────────── */
+.events-result-count {
+  padding-block: 0.75rem;
+  color: var(--muted);
+  font: 500 0.6875rem/1 var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ─── Bottom sheet (mobile) ────────────────────────────────────────────── */
+.events-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+  background: rgb(16 16 16 / 0);
+  pointer-events: none;
+  transition: background-color 300ms var(--ease);
+}
+
+.events-sheet-backdrop--open {
+  background: rgb(16 16 16 / 0.7);
+  pointer-events: auto;
+}
+
+.events-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  max-height: 90dvh;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--void-2);
+  border: 1px solid var(--line-strong);
+  border-bottom: none;
+  transform: translateY(100%);
+  transition: transform 340ms var(--ease);
+  /* Ensure the sheet is above the bottom nav */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.events-sheet--open {
+  transform: translateY(0);
+}
+
+.events-sheet-handle {
+  width: 2.5rem;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--line-strong);
+  margin: 0.65rem auto 0;
+  flex-shrink: 0;
+}
+
+.events-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem 0.6rem;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.events-sheet-title {
+  font: 700 0.75rem/1 var(--font-mono);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--coral);
+}
+
+.events-sheet-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--bone);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
+}
+
+.events-sheet-close:hover {
+  border-color: var(--coral);
+  background: rgb(239 133 87 / 0.1);
+}
+
+.events-sheet-close:focus-visible {
+  outline: 2px solid var(--coral);
+  outline-offset: 2px;
+}
+
+.events-sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 1.25rem;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Stack filter row vertically inside sheet */
+.events-sheet-body .events-filter-row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+}
+
+.events-sheet-body .events-chip-group {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.events-sheet-body .events-chip-legend {
+  display: block;
+  font: 700 0.625rem/1 var(--font-mono);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.events-sheet-body .events-chip-group > .events-chip-legend + * {
+  margin-top: 0;
+}
+
+/* Make chips in sheet full width on mobile */
+.events-sheet-body .events-chip-group:not(.events-chip-group--bools) .events-chip {
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.events-sheet-body .events-search-wrap {
+  max-width: 100%;
+}
+
+.events-sheet-footer {
+  flex-shrink: 0;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.events-sheet-apply {
+  width: 100%;
+  min-height: 2.75rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--coral);
+  color: var(--void);
+  font: 700 0.875rem/1 var(--font-body);
+  cursor: pointer;
+  transition:
+    transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.events-sheet-apply:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px -8px rgb(239 133 87 / 0.6);
+}
+
+.events-sheet-apply:focus-visible {
+  outline: 3px solid var(--coral);
+  outline-offset: 3px;
+}
+
+/* Hide sheet on desktop */
+@media (min-width: 768px) {
+  .events-sheet,
+  .events-sheet-backdrop {
+    display: none;
+  }
+}
