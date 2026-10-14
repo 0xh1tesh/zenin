@@ -1,0 +1,358 @@
+/* ─── Two-Column Layout Grid ──────────────────────────────────────────── */
+.detail-body {
+  display: grid;
+  gap: 2.5rem;
+  padding-block: clamp(2rem, 5vw, 4rem);
+}
+
+@media (min-width: 1024px) {
+  .detail-body {
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    gap: clamp(2.5rem, 4vw, 4rem);
+    align-items: start;
+  }
+}
+
+.detail-content {
+  min-width: 0;
+}
+
+/* ─── Generic Section Structure ───────────────────────────────────────── */
+.detail-section {
+  scroll-margin-top: calc(var(--topbar-h) + 4.5rem);
+  margin-bottom: clamp(3rem, 6vw, 4.5rem);
+}
+
+.detail-section__header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.detail-section__num {
+  font: 700 0.8125rem/1 var(--font-mono);
+  letter-spacing: 0.16em;
+  color: var(--coral);
+}
+
+.detail-section__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3vw, 2.1rem);
+  font-weight: 700;
+  color: var(--sand);
+  letter-spacing: -0.02em;
+}
+
+.detail-section__rule {
+  height: 1px;
+  background: var(--line);
+  margin-bottom: 1.5rem;
+}
+
+/* ─── About Section ───────────────────────────────────────────────────── */
+.detail-about__para {
+  font-size: var(--step-0);
+  line-height: 1.7;
+  color: var(--bone);
+  max-width: 68ch;
+  margin-bottom: 1.25rem;
+}
+
+.detail-about__para:last-child {
+  margin-bottom: 0;
+}
+
+/* ─── Checklist Sections (Highlights, Expectations, Eligibility, etc.) ── */
+.detail-checklist {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.detail-checklist__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: var(--void-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--bone);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.detail-checklist__icon {
+  flex-shrink: 0;
+  width: 1.15rem;
+  height: 1.15rem;
+  color: var(--coral);
+  margin-top: 0.15rem;
+}
+
+/* Rules Ordered List */
+.detail-rules__list {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: rule-counter;
+}
+
+.detail-rules__item {
+  counter-increment: rule-counter;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+  background: var(--void-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--bone);
+  line-height: 1.6;
+}
+
+.detail-rules__item::before {
+  content: counter(rule-counter, decimal-leading-zero);
+  font: 700 0.75rem var(--font-mono);
+  letter-spacing: 0.1em;
+  color: var(--coral);
+  background: rgb(239 133 87 / 0.1);
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+/* ─── FAQs Accordion ──────────────────────────────────────────────────── */
+.detail-faq {
+  background: var(--void-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.75rem;
+  transition: border-color var(--dur) var(--ease);
+}
+
+.detail-faq[open] {
+  border-color: var(--line-strong);
+}
+
+.detail-faq__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem 1.25rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--sand);
+  list-style: none;
+}
+
+.detail-faq__summary::-webkit-details-marker {
+  display: none;
+}
+
+.detail-faq__summary:hover {
+  color: var(--coral);
+}
+
+.detail-faq__chevron {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--coral);
+  flex-shrink: 0;
+  transition: transform var(--dur) var(--ease);
+}
+
+.detail-faq[open] .detail-faq__chevron {
+  transform: rotate(180deg);
+}
+
+.detail-faq__answer {
+  padding: 0 1.25rem 1.25rem;
+  color: var(--bone);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+/* ─── Gallery Grid ────────────────────────────────────────────────────── */
+.detail-gallery__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: 1rem;
+}
+
+.detail-gallery__item {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--void-2);
+}
+
+.detail-gallery__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform var(--dur) var(--ease);
+}
+
+.detail-gallery__item:hover .detail-gallery__img {
+  transform: scale(1.03);
+}
+
+/* ─── Organisers & Coordinators ───────────────────────────────────────── */
+.detail-team__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-team-card {
+  padding: 1.15rem 1.25rem;
+  background: var(--void-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-team-card__role {
+  font: 500 0.6875rem/1 var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--coral);
+  margin-bottom: 0.35rem;
+}
+
+.detail-team-card__name {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--sand);
+  margin-bottom: 0.6rem;
+}
+
+.detail-team-card__contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  font: 500 0.75rem var(--font-mono);
+  color: var(--bone);
+  text-decoration: none;
+  transition: color var(--dur) var(--ease);
+}
+
+.detail-team-card__contact:hover {
+  color: var(--coral);
+}
+
+.detail-team-card__contact svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  color: var(--coral);
+}
+
+/* ─── Prev/Next & Related Events ──────────────────────────────────────── */
+.detail-prevnext {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 3.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--line);
+}
+
+@media (min-width: 640px) {
+  .detail-prevnext {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.detail-prevnext__link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.15rem 1.25rem;
+  background: var(--void-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition:
+    border-color var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+.detail-prevnext__link:hover {
+  border-color: var(--coral);
+  transform: translateY(-2px);
+}
+
+.detail-prevnext__link--next {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.detail-prevnext__dir {
+  font: 600 0.6875rem var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--coral);
+}
+
+.detail-prevnext__name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--sand);
+}
+
+.detail-prevnext__date {
+  font: 500 0.75rem var(--font-mono);
+  color: var(--muted);
+}
+
+.detail-related {
+  margin-top: 3.5rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.detail-related__title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  color: var(--sand);
+  margin-bottom: 1.25rem;
+}
+
+.detail-related__grid {
+  display: grid;
+  gap: 0.85rem;
+}
+
+/* ─── Section Skeletons ───────────────────────────────────────────────── */
+.detail-skel-section {
+  margin-bottom: 3rem;
+}
+
+.detail-skel-line {
+  height: 1.2rem;
+  background: var(--void-3);
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.detail-skel-line--head {
+  width: 40%;
+  height: 2rem;
+  margin-bottom: 1.5rem;
+}

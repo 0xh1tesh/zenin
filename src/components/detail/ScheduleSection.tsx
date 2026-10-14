@@ -1,30 +1,42 @@
-import { type EventDetail } from '../../types'
+import type { Session } from '../../types'
 import { formatDate, formatTime } from '../../lib/format'
+import './detail-sections.css'
+import './detail-schedule.css'
 
 interface ScheduleSectionProps {
-  event: EventDetail
+  schedules: Session[]
+  num?: string
 }
 
-export default function ScheduleSection({ event }: ScheduleSectionProps) {
-  if (!event.schedules || event.schedules.length === 0) return null
+export default function ScheduleSection({ schedules, num = '03' }: ScheduleSectionProps) {
+  if (!schedules || schedules.length === 0) return null
 
   return (
     <section id="schedule" className="detail-section" aria-labelledby="schedule-heading">
-      <h2 id="schedule-heading" className="detail-section__heading">
-        <span className="detail-section__heading-num">02</span>
-        Schedule
-      </h2>
+      <div className="detail-section__header">
+        <span className="detail-section__num">{num} //</span>
+        <h2 id="schedule-heading" className="detail-section__title">
+          Schedule
+        </h2>
+      </div>
+      <div className="detail-section__rule" aria-hidden="true" />
+
       <ol className="detail-schedule__list" aria-label="Event sessions">
-        {event.schedules.map((session, i) => (
-          <li key={i} className="detail-schedule__session">
+        {schedules.map((session, i) => (
+          <li key={i} className="detail-schedule__card">
             <div className="detail-schedule__time-col">
               <span className="detail-schedule__date">
-                {formatDate(session.event_date, { day: 'numeric', month: 'short', weekday: 'short' })}
+                {formatDate(session.event_date, {
+                  day: 'numeric',
+                  month: 'short',
+                  weekday: 'short',
+                })}
               </span>
               <span className="detail-schedule__time">
-                {formatTime(session.start_time)}–{formatTime(session.end_time)}
+                {formatTime(session.start_time)} – {formatTime(session.end_time)} IST
               </span>
             </div>
+
             <div className="detail-schedule__venue">
               <svg
                 className="detail-schedule__venue-icon"
@@ -34,10 +46,10 @@ export default function ScheduleSection({ event }: ScheduleSectionProps) {
                 strokeWidth="2"
                 aria-hidden="true"
               >
-                <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                <circle cx="12" cy="10" r="3" />
               </svg>
-              {session.venue}
+              <span>{session.venue}</span>
             </div>
           </li>
         ))}

@@ -1,24 +1,39 @@
-import { type EventDetail } from '../../types'
+import type { Faq } from '../../types'
+import './detail-sections.css'
 
 interface FaqsSectionProps {
-  event: EventDetail
+  faqs: Faq[]
+  num?: string
 }
 
-export default function FaqsSection({ event }: FaqsSectionProps) {
-  if (!event.faqs || event.faqs.length === 0) return null
+export default function FaqsSection({ faqs, num = '05' }: FaqsSectionProps) {
+  if (!faqs || faqs.length === 0) return null
 
   return (
     <section id="faqs" className="detail-section" aria-labelledby="faqs-heading">
-      <h2 id="faqs-heading" className="detail-section__heading">
-        <span className="detail-section__heading-num">04</span>
-        FAQs
-      </h2>
+      <div className="detail-section__header">
+        <span className="detail-section__num">{num} //</span>
+        <h2 id="faqs-heading" className="detail-section__title">
+          Frequently Asked Questions
+        </h2>
+      </div>
+      <div className="detail-section__rule" aria-hidden="true" />
+
       <div className="detail-faqs__list" role="list">
-        {event.faqs.map((faq, i) => (
+        {faqs.map((faq, i) => (
           <details key={i} className="detail-faq" role="listitem">
-            <summary>
-              {faq.question}
-              <span className="sr-only">{' '}(click to expand)</span>
+            <summary className="detail-faq__summary">
+              <span>{faq.question}</span>
+              <svg
+                className="detail-faq__chevron"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                aria-hidden="true"
+              >
+                <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </summary>
             <p className="detail-faq__answer">{faq.answer}</p>
           </details>
