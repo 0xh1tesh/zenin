@@ -49,14 +49,10 @@ export default function ClosingSoon({ events }: ClosingSoonProps) {
             </Link>
           </div>
         ) : (
-          <div className="closing__list" role="list">
+          <ul className="closing__list">
             {closingEvents.map((event) => (
-              <article key={event.id} className="closing-row" role="listitem">
-                <Link
-                  to={`/events/${event.id}`}
-                  className="closing-row__link"
-                  aria-label={`Register for ${event.name}: ${event.category}`}
-                >
+              <li key={event.id} className="closing-row">
+                <Link to={`/events/${event.id}`} className="closing-row__link">
                   <div className="closing-row__main">
                     <span className="closing-row__cat mono">{event.category}</span>
                     <h3 className="closing-row__title">{event.name}</h3>
@@ -77,9 +73,9 @@ export default function ClosingSoon({ events }: ClosingSoonProps) {
                     </div>
                   </div>
                 </Link>
-              </article>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </div>
     </section>
