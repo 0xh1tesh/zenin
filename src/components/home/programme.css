@@ -1,0 +1,247 @@
+/* ─── The programme (Section 05) ───────────────────────────────────────── */
+.programme {
+  border-top: 1px solid var(--line);
+  position: relative;
+  background: var(--void);
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 700px;
+}
+
+.programme__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.programme__eyebrow {
+  margin-bottom: 0.5rem;
+}
+
+.programme__heading {
+  font-size: var(--step-2);
+  color: var(--sand);
+  letter-spacing: -0.02em;
+}
+
+.programme__legend {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+
+.programme__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Status dots */
+.prog-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.prog-dot--open {
+  background: var(--ok);
+  box-shadow: 0 0 8px rgb(143 214 160 / 0.6);
+}
+
+.prog-dot--sold {
+  background: var(--warn);
+  box-shadow: 0 0 8px rgb(242 176 30 / 0.6);
+}
+
+.prog-dot--closed {
+  background: var(--bad);
+}
+
+.prog-dot--archive {
+  background: var(--muted);
+}
+
+/* Month groups */
+.programme__groups {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.programme__month {
+  background: var(--void-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.programme__month-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  background: var(--void-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.programme__month-title {
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  color: var(--sand);
+  margin: 0;
+}
+
+.programme__month-count {
+  font-size: 0.75rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+.programme__month-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.programme__item:not(:last-child) {
+  border-bottom: 1px solid var(--line);
+}
+
+.programme-row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.95rem 1.5rem;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    background-color var(--dur) var(--ease),
+    padding-left var(--dur) var(--ease);
+}
+
+.programme-row:hover {
+  background: rgb(230 213 189 / 0.04);
+  padding-left: 1.75rem;
+}
+
+.programme-row.is-archived {
+  opacity: 0.55;
+}
+
+.programme-row.is-archived:hover {
+  opacity: 0.85;
+}
+
+.programme-row__date {
+  display: flex;
+  flex-direction: column;
+  min-width: 75px;
+  flex-shrink: 0;
+}
+
+.programme-row__day {
+  font-size: 0.85rem;
+  color: var(--sand);
+  font-weight: 600;
+}
+
+.programme-row__weekday {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.programme-row__indicator {
+  display: flex;
+  align-items: center;
+}
+
+.programme-row__content {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.programme-row__name {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--bone);
+  margin: 0;
+}
+
+.programme-row:hover .programme-row__name {
+  color: var(--coral);
+}
+
+.programme-row__cat {
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+.programme-row__meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.programme-row__status {
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  display: none;
+}
+
+@media (min-width: 600px) {
+  .programme-row__status {
+    display: inline;
+  }
+}
+
+.programme-row__arrow {
+  color: var(--muted);
+  font-size: 0.85rem;
+  transition: color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.programme-row:hover .programme-row__arrow {
+  color: var(--coral);
+  transform: translateX(3px);
+}
+
+.programme__empty {
+  padding: 3rem 2rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* Skeletons */
+.programme-row--skel {
+  padding: 1rem 1.5rem;
+}
+
+.programme-row__date-skel {
+  width: 60px;
+  height: 1.2rem;
+}
+
+.programme-row__title-skel {
+  flex: 1;
+  max-width: 320px;
+  height: 1.2rem;
+}
+
+.programme-row__meta-skel {
+  width: 80px;
+  height: 1.2rem;
+}

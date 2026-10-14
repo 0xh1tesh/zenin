@@ -1,0 +1,91 @@
+/* ─── Find your orbit CTA band (Section 06) ───────────────────────────── */
+.cta-band {
+  border-top: 1px solid var(--line);
+  position: relative;
+  background: var(--void);
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 400px;
+}
+
+.cta-band__card {
+  position: relative;
+  background: linear-gradient(135deg, var(--void-2) 0%, var(--void-3) 100%);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  padding: clamp(3rem, 7vw, 5.5rem) clamp(1.5rem, 5vw, 4rem);
+  text-align: center;
+  overflow: hidden;
+}
+
+.cta-band__glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 600px;
+  height: 600px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgb(239 133 87 / 0.12) 0%, rgb(213 54 12 / 0.04) 50%, transparent 70%);
+  pointer-events: none;
+}
+
+.cta-band__grid-deco {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgb(230 213 189 / 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(230 213 189 / 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+.cta-band__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 64ch;
+  margin-inline: auto;
+}
+
+.cta-band__eyebrow {
+  margin-bottom: 1rem;
+}
+
+.cta-band__title {
+  font-size: var(--step-4);
+  color: var(--sand);
+  line-height: 1.05;
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.03em;
+}
+
+.cta-band__tagline {
+  font-size: var(--step-0);
+  color: var(--bone);
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+
+.cta-band__actions {
+  display: flex;
+  gap: 1.25rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+}
+
+.cta-band__telemetry {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+
+.cta-band__dot {
+  color: var(--coral);
+}

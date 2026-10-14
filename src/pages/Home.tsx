@@ -1,44 +1,68 @@
-import { Link } from 'react-router-dom'
-import EventCard from '../components/EventCard'
-import ErrorState from '../components/ui/ErrorState'
-import Seo from '../components/ui/Seo'
-import { EventGridSkeleton, RetryNote } from '../components/ui/Skeleton'
 import { useEvents } from '../lib/useAsync'
+import Hero, { type HeroStats } from '../components/hero/Hero'
+import Seo from '../components/ui/Seo'
+import StaleNotice from '../components/ui/StaleNotice'
+import ErrorState from '../components/ui/ErrorState'
+import EmptyState from '../components/ui/EmptyState'
+import { RetryNote } from '../components/ui/Skeleton'
+import SignalStrip from '../components/home/SignalStrip'
+import FieldFlight from '../components/home/FieldFlight'
+import ClosingSoon from '../components/home/ClosingSoon'
+import BrowseTiles from '../components/home/BrowseTiles'
+import Programme from '../components/home/Programme'
+import CtaBand from '../components/home/CtaBand'
+import { computeHeroStats } from '../components/home/helpers'
+import '../components/home/home.css'
 
-/** Phase 0 baseline: the hero and landing workers replace this with the cosmic experience. */
 export default function Home() {
   const { state, retry } = useEvents()
-  const featured = state.status === 'success' ? state.data.filter((e) => e.is_featured).slice(0, 6) : []
+
+  const events = state.status === 'success' ? state.data : null
+  const heroStats: HeroStats = computeHeroStats(events)
 
   return (
-    <div className="container section">
+    <div className="page-bleed">
       <Seo
-        title="Zenith '26 — Pune's inter-college fest"
-        description="Thirty hackathons, workshops, performances and contests across two months. Find your event and register."
+        title="Zenith '26 — Pune's Inter-College Cosmic Fest"
+        description="Thirty hackathons, workshops, performances and competitions across two months. Explore Pune's flagship cosmic festival and register now."
       />
-      <p className="eyebrow">Pune · Sep – Nov 2026</p>
-      <h1 style={{ fontSize: 'var(--step-5)', marginTop: '1rem' }}>ZENITH &apos;26</h1>
-      <p style={{ maxWidth: '40ch', margin: '1.5rem 0 2rem', color: 'var(--muted)' }}>
-        Thirty events. Two months. One sky.
-      </p>
-      <Link className="btn btn--primary" to="/events">
-        Explore events
-      </Link>
 
-      <h2 style={{ margin: '4rem 0 1.5rem', fontSize: 'var(--step-2)' }}>Featured</h2>
+      <Hero stats={heroStats} />
+
       {state.status === 'loading' && (
-        <>
+        <div className="container">
           <RetryNote attempt={state.attempt} />
-          <EventGridSkeleton count={3} />
-        </>
-      )}
-      {state.status === 'error' && <ErrorState error={state.error} onRetry={retry} />}
-      {state.status === 'success' && (
-        <div className="ecard-grid">
-          {featured.map((event, i) => (
-            <EventCard key={event.id} event={event} index={i} />
-          ))}
         </div>
+      )}
+
+      {state.status === 'success' && state.stale && (
+        <div className="container home-stale-wrap">
+          <StaleNotice source={state.source} fetchedAt={state.fetchedAt} onRetry={retry} />
+        </div>
+      )}
+
+      {state.status === 'error' ? (
+        <div className="container section">
+          <ErrorState error={state.error} onRetry={retry} />
+        </div>
+      ) : state.status === 'success' && events && events.length === 0 ? (
+        <div className="container section">
+          <EmptyState
+            title="No events found in programme"
+            body="Transmissions have not arrived from mission control yet. Check back shortly."
+            actionLabel="Retry connection"
+            onAction={retry}
+          />
+        </div>
+      ) : (
+        <>
+          <SignalStrip events={events} />
+          <FieldFlight events={events} />
+          <ClosingSoon events={events} />
+          <BrowseTiles events={events} />
+          <Programme events={events} />
+          <CtaBand />
+        </>
       )}
     </div>
   )
