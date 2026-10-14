@@ -242,18 +242,22 @@ interface BottomSheetProps {
 function BottomSheet({ open, onClose, filters, onFilter }: BottomSheetProps) {
   const sheetRef = useRef<HTMLDivElement>(null)
 
-  // Trap focus + close on Escape
+  // Move focus into the sheet, close on Escape, and hand focus back to the opener afterwards
   useEffect(() => {
     if (!open) return
     const sheet = sheetRef.current
     if (!sheet) return
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null
     sheet.focus()
 
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
     document.addEventListener('keydown', handleKey)
-    return () => document.removeEventListener('keydown', handleKey)
+    return () => {
+      document.removeEventListener('keydown', handleKey)
+      opener?.focus()
+    }
   }, [open, onClose])
 
   // Prevent body scroll when open
@@ -280,6 +284,7 @@ function BottomSheet({ open, onClose, filters, onFilter }: BottomSheetProps) {
         role="dialog"
         aria-modal="true"
         aria-label="Filter events"
+        inert={!open}
         tabIndex={-1}
         className={`events-sheet${open ? ' events-sheet--open' : ''}`}
       >
