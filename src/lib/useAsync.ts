@@ -31,7 +31,9 @@ function success<T>(loaded: Loaded<T>, isRevalidating: boolean): AsyncState<T> {
   return {
     status: 'success',
     data: loaded.data,
-    stale: loaded.stale,
+    // While a background refresh is running the data is not "stale" to the visitor yet;
+    // the notice only appears if that refresh fails (see the catch below).
+    stale: loaded.stale && !isRevalidating,
     source: loaded.source,
     fetchedAt: loaded.fetchedAt,
     isRevalidating,

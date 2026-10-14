@@ -12,7 +12,8 @@ const snapshot = JSON.parse(readFileSync(new URL('../public/events-snapshot.json
   events: unknown[]
 }
 
-async function snapshotMissing(page: Page) {
+/** Removes every offline fallback (HTML seed + bundled snapshot) so the error states are reachable. */
+async function noFallbacks(page: Page) {
   await page.route(SNAPSHOT, (route) => route.fulfill({ status: 404, body: 'not found' }))
 }
 
@@ -29,16 +30,16 @@ test('retries three times, then shows the offline snapshot when the API returns 
 })
 
 test('tells the visitor it is retrying while the server keeps failing', async ({ page }) => {
-  await snapshotMissing(page)
+  await noFallbacks(page)
   await page.route(LIST, (route) => route.fulfill({ status: 503, body: '{}' }))
-  await page.goto('/events')
+  await page.goto('/events?snapshot=off')
   await expect(page.getByText(/retrying 2\/3/i)).toBeVisible({ timeout: 10_000 })
 })
 
 test('shows a branded error with a retry button when the network is down and nothing is cached', async ({ page }) => {
-  await snapshotMissing(page)
+  await noFallbacks(page)
   await page.route(LIST, (route) => route.abort('connectionrefused'))
-  await page.goto('/events')
+  await page.goto('/events?snapshot=off')
   await expect(page.getByRole('heading', { name: /signal lost/i })).toBeVisible({ timeout: 15_000 })
 
   await page.unroute(LIST)
@@ -54,9 +55,9 @@ test('shows a friendly empty state when the API returns no events', async ({ pag
 })
 
 test('survives a malformed response', async ({ page }) => {
-  await snapshotMissing(page)
+  await noFallbacks(page)
   await page.route(LIST, (route) => route.fulfill({ json: { unexpected: true } }))
-  await page.goto('/events')
+  await page.goto('/events?snapshot=off')
   await expect(page.getByRole('heading', { name: /garbled transmission/i })).toBeVisible({ timeout: 15_000 })
 })
 
@@ -66,6 +67,14 @@ test('skips malformed items but keeps the valid ones', async ({ page }) => {
   await page.route(LIST, (route) => route.fulfill({ json: { events: [...valid, { broken: true }, null] } }))
   await page.goto('/events')
   await expect(page.locator('.ecard')).toHaveCount(3)
+})
+
+test('paints events from the build-time seed while the API never answers', async ({ page }) => {
+  await page.route(LIST, () => {
+    /* never fulfilled: the request hangs */
+  })
+  await page.goto('/events')
+  await expect(page.locator('.ecard').first()).toBeVisible({ timeout: 4000 })
 })
 
 test('?chaos=timeout simulates a slow server', async ({ page }) => {

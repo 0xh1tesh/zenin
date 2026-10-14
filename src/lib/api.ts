@@ -76,11 +76,36 @@ function fromEntry<T>(entry: Entry<T>): Loaded<T> {
   return { data: entry.data, stale: !isFresh(entry.at), source: 'cache', fetchedAt: entry.at }
 }
 
+/**
+ * The build embeds a snapshot of the event list in the HTML (`#seed-events`), so a first-time
+ * visitor sees cards on first render, before any network request. It is always revalidated.
+ */
+let seedCache: Loaded<EventSummary[]> | null | undefined
+
+function readSeed(): Loaded<EventSummary[]> | null {
+  if (seedCache !== undefined) return seedCache
+  seedCache = null
+  try {
+    const raw = document.getElementById('seed-events')?.textContent
+    if (!raw) return seedCache
+    const rec = JSON.parse(raw) as { generated_at?: string; events?: unknown }
+    const events = parseEventList({ events: rec.events })
+    if (events.length > 0) {
+      const at = rec.generated_at ? Date.parse(rec.generated_at) : NaN
+      seedCache = { data: events, stale: true, source: 'snapshot', fetchedAt: Number.isNaN(at) ? Date.now() : at }
+    }
+  } catch {
+    seedCache = null
+  }
+  return seedCache
+}
+
 /** Synchronous read for instant first paint. Disabled while chaos mode is on. */
 export function peekEvents(): Loaded<EventSummary[]> | null {
   if (chaosMode()) return null
   const entry = readEntry<EventSummary[]>('list')
-  return entry ? fromEntry(entry) : null
+  if (entry) return fromEntry(entry)
+  return snapshotDisabled() ? null : readSeed()
 }
 
 export function peekEvent(id: string): Loaded<EventDetail> | null {
@@ -229,6 +254,8 @@ async function loadList(onAttempt: (a: Attempt) => void): Promise<Loaded<EventSu
   } catch (err) {
     const cached = readEntry<EventSummary[]>('list')
     if (cached) return { data: cached.data, stale: true, source: 'cache', fetchedAt: cached.at }
+    const seed = snapshotDisabled() ? null : readSeed()
+    if (seed) return seed
     const snapshot = await loadSnapshot()
     if (snapshot) return { data: snapshot.events, stale: true, source: 'snapshot', fetchedAt: snapshot.at }
     throw toApiError(err)

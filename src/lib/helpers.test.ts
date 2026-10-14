@@ -10,23 +10,32 @@ import {
   splitDuration,
 } from './format'
 import { buildIcs, deadlineToIcs, toIcsDate } from './ics'
-import { resizeImage, responsiveImage } from './image'
+import { externalImage, resizeImage, responsiveImage } from './image'
 import type { EventSummary } from '../types'
 
 describe('image helpers', () => {
   const src = 'https://images.pexels.com/photos/1/pexels-photo-1.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop'
 
-  it('rewrites pexels urls to the requested size and format', () => {
-    const url = new URL(resizeImage(src, 480, 320))
+  it('serves pexels images through the same-origin proxy at the requested size and format', () => {
+    const resized = resizeImage(src, 480, 320)
+    expect(resized.startsWith('/img/photos/1/')).toBe(true)
+    const url = new URL(resized, 'http://localhost')
     expect(url.searchParams.get('w')).toBe('480')
     expect(url.searchParams.get('h')).toBe('320')
     expect(url.searchParams.get('fm')).toBe('webp')
   })
 
   it('drops the crop params when no height is given', () => {
-    const url = new URL(resizeImage(src, 800))
+    const url = new URL(resizeImage(src, 800), 'http://localhost')
     expect(url.searchParams.has('h')).toBe(false)
     expect(url.searchParams.has('fit')).toBe(false)
+  })
+
+  it('keeps an absolute pexels url for open graph and structured data', () => {
+    const url = new URL(externalImage(src, 1200, 630))
+    expect(url.hostname).toBe('images.pexels.com')
+    expect(url.searchParams.get('w')).toBe('1200')
+    expect(url.searchParams.get('fm')).toBeNull()
   })
 
   it('leaves other hosts untouched and tolerates garbage', () => {
