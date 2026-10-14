@@ -172,14 +172,13 @@ function runShared<T>(
   let flight = flights.get(key)
   if (!flight) {
     const listeners = new Set<(a: Attempt) => void>()
-    const created: Flight = {
-      listeners,
-      promise: run((a) => {
-        created.last = a
-        listeners.forEach((l) => l(a))
-      }).finally(() => flights.delete(key)),
-    }
+    // Register the flight before running: `run` reports attempt 1 synchronously.
+    const created: Flight = { listeners, promise: Promise.resolve() as unknown as Promise<Loaded<unknown>> }
     flights.set(key, created)
+    created.promise = run((a) => {
+      created.last = a
+      listeners.forEach((l) => l(a))
+    }).finally(() => flights.delete(key))
     flight = created
   }
   if (onAttempt) {
