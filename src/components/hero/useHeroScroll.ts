@@ -1,5 +1,5 @@
 import { useEffect, type RefObject } from 'react'
-import { loadGsap, useReducedMotion } from '../../lib/motion'
+import { afterFirstInteraction, loadGsap, useReducedMotion } from '../../lib/motion'
 import { ORBITS, orbitPoint } from './Orbits'
 
 const DIVE_ORIGIN = '50% 100%'
@@ -76,13 +76,12 @@ export function useHeroScroll(track: RefObject<HTMLElement | null>) {
       revert = () => ctx.revert()
     }
 
-    const hasIdle = typeof window.requestIdleCallback === 'function'
-    const handle = hasIdle ? window.requestIdleCallback(() => void init(), { timeout: 1500 }) : window.setTimeout(() => void init(), 600)
+    // The scene is already composed and pinned by CSS; the scrub only needs to exist once the visitor scrolls.
+    const cancelWait = afterFirstInteraction(() => void init())
 
     return () => {
       cancelled = true
-      if (hasIdle) window.cancelIdleCallback(handle)
-      else window.clearTimeout(handle)
+      cancelWait()
       revert?.()
     }
   }, [track, reduced])

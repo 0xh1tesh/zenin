@@ -1,5 +1,6 @@
 import { Suspense, useEffect } from 'react'
 import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom'
+import { afterFirstInteraction } from '../../lib/motion'
 import { startSmoothScroll } from '../../lib/smoothScroll'
 import { EventGridSkeleton } from '../ui/Skeleton'
 import BottomNav from './BottomNav'
@@ -31,12 +32,10 @@ export default function Layout() {
         else stop = cleanup
       })
     }
-    const hasIdle = typeof window.requestIdleCallback === 'function'
-    const handle = hasIdle ? window.requestIdleCallback(start, { timeout: 2500 }) : window.setTimeout(start, 1500)
+    const cancelWait = afterFirstInteraction(start)
     return () => {
       cancelled = true
-      if (hasIdle) window.cancelIdleCallback(handle)
-      else window.clearTimeout(handle)
+      cancelWait()
       stop()
     }
   }, [])

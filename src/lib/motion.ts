@@ -16,6 +16,33 @@ export function useReducedMotion(): boolean {
   return useSyncExternalStore(subscribe, prefersReducedMotion, () => false)
 }
 
+/**
+ * Runs `callback` on the visitor's first scroll, tap, key press or pointer press, or after a long
+ * fallback delay. Heavy animation setup waits for this so it never competes with first paint or
+ * inflates blocking time. Returns a function that cancels the pending run.
+ */
+export function afterFirstInteraction(callback: () => void, fallbackMs = 10_000): () => void {
+  const events = ['pointerdown', 'keydown', 'wheel', 'touchstart', 'scroll'] as const
+  let done = false
+  let timer: ReturnType<typeof setTimeout> | undefined
+
+  const cancel = () => {
+    done = true
+    for (const name of events) window.removeEventListener(name, run)
+    if (timer !== undefined) clearTimeout(timer)
+  }
+
+  function run() {
+    if (done) return
+    cancel()
+    callback()
+  }
+
+  for (const name of events) window.addEventListener(name, run, { passive: true })
+  timer = setTimeout(run, fallbackMs)
+  return cancel
+}
+
 /* ─── GSAP is loaded on demand so it never blocks first paint ───────────── */
 
 export type GsapCore = typeof import('gsap')['gsap']

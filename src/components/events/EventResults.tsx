@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { EventSummary } from '../../types'
 import { formatMonth, monthKey } from '../../lib/format'
-import { loadFlip, useReducedMotion } from '../../lib/motion'
+import { afterFirstInteraction, loadFlip, useReducedMotion } from '../../lib/motion'
 import EventCard from '../EventCard'
 import type { SortKey, ViewMode } from './useEventFilters'
 import './events.css'
@@ -68,12 +68,11 @@ export default function EventResults({ events, view, sort, resetKey }: EventResu
         })
         .catch(() => undefined)
     }
-    const hasIdle = typeof window.requestIdleCallback === 'function'
-    const handle = hasIdle ? window.requestIdleCallback(load, { timeout: 2000 }) : window.setTimeout(load, 600)
+    // Filter transitions only matter once the visitor starts interacting.
+    const cancelWait = afterFirstInteraction(load)
     return () => {
       live = false
-      if (hasIdle) window.cancelIdleCallback(handle)
-      else window.clearTimeout(handle)
+      cancelWait()
     }
   }, [reduced])
 

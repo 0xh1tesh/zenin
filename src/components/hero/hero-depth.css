@@ -168,6 +168,28 @@
   }
 }
 
+/*
+ * The headline letters must be visible from the very first paint: it is the LCP element, and
+ * Chrome does not count text that is still at opacity 0. They only slide into place.
+ */
+.hero__letter {
+  opacity: 1;
+  transform: translateY(0.35em);
+  animation: hero-letter-rise 520ms var(--ease) forwards;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+
+.hero__letter--space {
+  animation: none;
+  transform: none;
+}
+
+@keyframes hero-letter-rise {
+  to {
+    transform: translateY(0);
+  }
+}
+
 /* Reduced motion: a fully composed static scene, nothing hidden waiting for an animation */
 @media (prefers-reduced-motion: reduce) {
   .hero__letter,

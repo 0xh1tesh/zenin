@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useReducedMotion, loadGsap } from '../../lib/motion'
+import { afterFirstInteraction, loadGsap, useReducedMotion } from '../../lib/motion'
 import { responsiveImage } from '../../lib/image'
 import { formatDate } from '../../lib/format'
 import type { EventSummary } from '../../types'
@@ -130,15 +130,12 @@ export default function FieldFlight({ events }: FieldFlightProps) {
       })
     }
 
-    const hasIdle = typeof window.requestIdleCallback === 'function'
-    const handle = hasIdle
-      ? window.requestIdleCallback(init, { timeout: 2000 })
-      : window.setTimeout(init, 800)
+    // The first slide is already shown by CSS; the 3D scrub is only needed once the visitor scrolls.
+    const cancelWait = afterFirstInteraction(init)
 
     return () => {
       cancelled = true
-      if (hasIdle) window.cancelIdleCallback(handle)
-      else window.clearTimeout(handle)
+      cancelWait()
       cleanup?.()
     }
   }, [isDesktop, reducedMotion, events])
