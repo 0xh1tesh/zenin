@@ -1,0 +1,160 @@
+/* Depth, composition and layout overrides on top of hero-scene.css / hero-ui.css */
+
+.hero__stage {
+  --pw: min(38vw, 24rem); /* planet diameter */
+  --pbottom: -8%; /* planet wrap offset (matches hero-scene.css) */
+  --os: min(135vw, 66rem); /* orbit svg size */
+}
+
+@media (max-width: 640px) {
+  .hero__stage {
+    --pw: 70vw;
+    --pbottom: -16%;
+    --os: 150vw;
+  }
+}
+
+/* Dive layers scale around the bottom centre of the stage */
+.hero__planet,
+.hero__orbits,
+.hero__ridge {
+  transform-origin: 50% 100%;
+}
+
+/* Orbits: centred exactly on the planet so scaling the layers keeps them aligned */
+.hero__orbits svg {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--pbottom) + var(--pw) / 2 - var(--os) / 2);
+  width: var(--os);
+  height: var(--os);
+  transform: translateX(-50%);
+  overflow: visible;
+}
+
+/* Giant outlined word behind everything, engraved into the sky */
+.hero__title {
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  padding-bottom: 4%;
+  overflow: hidden;
+}
+
+.hero__title span {
+  font: 800 clamp(8rem, 26vw, 28rem) / 0.8 var(--font-display);
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(230 213 189 / 0.12);
+  user-select: none;
+}
+
+.hero__ridge-fill--near {
+  fill: #0a0a09;
+}
+
+/* ─── Composition: copy in the upper stage, stats and next-up in the corners ─── */
+.hero__overlay {
+  justify-content: flex-start;
+  padding-top: calc(var(--topbar-h) + clamp(1rem, 6vh, 4rem));
+}
+
+.hero__h1 {
+  display: grid;
+  justify-items: center;
+  gap: 0.1em;
+}
+
+.hero__h1-visual {
+  display: grid;
+  justify-items: center;
+}
+
+.hero__h1-word {
+  display: block;
+  white-space: nowrap;
+}
+
+.hero__h1-year {
+  display: block;
+  margin-top: 0.05em;
+  font-size: 0.42em;
+  letter-spacing: 0.05em;
+}
+
+.hero__tagline {
+  text-shadow: 0 1px 12px rgb(16 16 16 / 0.8);
+}
+
+.hero__next-name {
+  max-width: 28ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--bone);
+}
+
+.hero__stats {
+  padding: 0.75rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgb(16 16 16 / 0.62);
+}
+
+@media (min-width: 1024px) {
+  .hero__stats {
+    position: absolute;
+    left: calc(var(--gutter) + var(--rail-w));
+    bottom: 2.25rem;
+    margin: 0;
+    text-align: left;
+  }
+
+  .hero__stat {
+    text-align: left;
+  }
+
+  .hero__next {
+    position: absolute;
+    right: var(--gutter);
+    bottom: 2.4rem;
+    margin: 0;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  .hero__next {
+    margin-top: 0.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero__overlay {
+    padding-top: calc(var(--topbar-h) + 0.75rem);
+  }
+
+  .hero__tagline {
+    margin-bottom: 1.25rem;
+  }
+
+  .hero__next-name {
+    max-width: 18ch;
+  }
+}
+
+/* Reduced motion: a fully composed static scene, nothing hidden waiting for an animation */
+@media (prefers-reduced-motion: reduce) {
+  .hero__letter,
+  .hero__tagline,
+  .hero__ctas,
+  .hero__stats,
+  .hero__next {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
