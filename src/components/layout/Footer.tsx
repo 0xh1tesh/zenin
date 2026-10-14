@@ -1,35 +1,41 @@
 import { Link } from 'react-router-dom'
-
-const YEAR = new Date().getFullYear()
+import './layout.css'
 
 export default function Footer() {
   return (
-    <footer className="layout-footer" role="contentinfo">
-      <div className="container layout-footer__inner">
-        <div className="layout-footer__brand">
-          <Link to="/" className="layout-footer__logo" aria-label="Kaleidoscope '26 home">
-            <span className="layout-footer__logo-k">K</span>
-            <span className="layout-footer__logo-rest">aleidoscope '26</span>
-          </Link>
-          <p className="layout-footer__tagline">Pune's Inter-College Festival</p>
+    <footer className="footer">
+      <div className="container footer__inner">
+        <div className="footer__cols">
+          <div>
+            <p className="eyebrow">Zenith &apos;26 · Pune</p>
+            <p className="footer__blurb">
+              Two months, thirty events, one sky. Hackathons, robotics, AI, dance, theatre and everything in between.
+            </p>
+          </div>
+          <nav aria-label="Footer">
+            <ul className="footer__links">
+              <li>
+                <Link to="/events">All events</Link>
+              </li>
+              <li>
+                <Link to="/events?open=1&sort=deadline">Closing soon</Link>
+              </li>
+              <li>
+                <Link to="/events?price=free">Free to join</Link>
+              </li>
+              <li>
+                <Link to="/events?type=workshop">Workshops</Link>
+              </li>
+            </ul>
+          </nav>
         </div>
-
-        <nav className="layout-footer__nav" aria-label="Footer navigation">
-          <ul className="layout-footer__nav-list" role="list">
-            <li><Link to="/" className="layout-footer__link">Home</Link></li>
-            <li><Link to="/events" className="layout-footer__link">All Events</Link></li>
-          </ul>
-        </nav>
-
-        <div className="layout-footer__meta">
-          <p className="layout-footer__dates">26 Sep – 15 Nov 2026 · Pune</p>
-          <p className="layout-footer__copy">
-            &copy; {YEAR} Kaleidoscope '26. All rights reserved.
-          </p>
-        </div>
+        <p className="footer__credit">
+          Built for the Render72 design challenge. Event data from the Render72 API · Photos from Pexels.
+        </p>
       </div>
-
-      <div className="layout-footer__rule" aria-hidden="true" />
+      <p className="footer__wordmark" aria-hidden="true">
+        ZENITH
+      </p>
     </footer>
   )
 }

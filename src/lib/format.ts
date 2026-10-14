@@ -42,14 +42,46 @@ export function formatDeadline(iso: string) {
   }).format(new Date(iso))
 }
 
+/** "14 Oct, 3:20 pm" for any timestamp, in IST. */
+export function formatStamp(ms: number) {
+  return formatDeadline(new Date(ms).toISOString())
+}
+
 export function daysUntil(iso: string, now = Date.now()) {
   return Math.ceil((new Date(iso).getTime() - now) / 86_400_000)
 }
 
+export interface Duration {
+  days: number
+  hours: number
+  minutes: number
+  seconds: number
+}
+
+export function splitDuration(ms: number): Duration {
+  const total = Math.max(0, Math.floor(ms / 1000))
+  return {
+    days: Math.floor(total / 86_400),
+    hours: Math.floor((total % 86_400) / 3600),
+    minutes: Math.floor((total % 3600) / 60),
+    seconds: total % 60,
+  }
+}
+
+/** "2026-11" for grouping events by month. */
+export function monthKey(date: string) {
+  return date.slice(0, 7)
+}
+
+export function formatMonth(key: string) {
+  return new Intl.DateTimeFormat('en-IN', { timeZone: IST, month: 'long', year: 'numeric' }).format(
+    istDate(`${key}-01`),
+  )
+}
+
 export function formatPrice(e: Pick<EventSummary, 'price' | 'is_per_head'>) {
   if (e.price === 0) return 'Free'
-  const amount = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(e.price)
-  return `${amount}${e.is_per_head ? ' / person' : ' / team'}`
+  return `${formatInr(e.price)}${e.is_per_head ? ' / person' : ' / team'}`
 }
 
 export function formatTeam(e: Pick<EventSummary, 'min_teamsize' | 'max_teamsize'>) {

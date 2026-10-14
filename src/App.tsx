@@ -1,94 +1,48 @@
-import { lazy, Suspense, useEffect } from 'react'
-import { createBrowserRouter, RouterProvider, useLocation, Outlet } from 'react-router-dom'
+import { lazy } from 'react'
+import { createBrowserRouter, Link, RouterProvider, useRouteError } from 'react-router-dom'
 import Layout from './components/layout/Layout'
 import NotFound from './pages/NotFound'
-import { EventCardSkeleton } from './components/ui/Skeleton'
-import './App.css'
+import './components/ui/ui.css'
 
 const Home = lazy(() => import('./pages/Home'))
 const Events = lazy(() => import('./pages/Events'))
 const EventDetail = lazy(() => import('./pages/EventDetail'))
 
-function PageFallback() {
+/** Router-level failures (e.g. a lazy chunk that failed to load while offline). */
+function RouteError() {
+  const error = useRouteError()
+  const chunkFailed = error instanceof Error && /dynamically imported module|Failed to fetch/i.test(error.message)
   return (
-    <div className="app-page-fallback">
-      <div className="container app-page-fallback__grid">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <EventCardSkeleton key={i} />
-        ))}
-      </div>
+    <div className="container section">
+      <section className="ui-state" role="alert">
+        <h1 className="ui-state__title">{chunkFailed ? 'Couldn’t load this page' : 'Something went wrong'}</h1>
+        <p className="ui-state__body">
+          {chunkFailed
+            ? 'Your connection dropped while the page was loading. Reload to try again.'
+            : 'An unexpected error stopped this page from rendering.'}
+        </p>
+        <div className="ui-state__actions">
+          <button type="button" className="btn btn--primary" onClick={() => window.location.reload()}>
+            Reload page
+          </button>
+          <Link className="btn btn--ghost" to="/">
+            Back to home
+          </Link>
+        </div>
+      </section>
     </div>
-  )
-}
-
-function ScrollToTop() {
-  const { pathname } = useLocation()
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' })
-  }, [pathname])
-  return null
-}
-
-function RouteTransition() {
-  const { pathname } = useLocation()
-  useEffect(() => {
-    const el = document.getElementById('route-transition')
-    if (!el) return
-    el.setAttribute('data-active', 'true')
-    const t = setTimeout(() => el.removeAttribute('data-active'), 350)
-    return () => clearTimeout(t)
-  }, [pathname])
-  return null
-}
-
-function AppShell() {
-  return (
-    <>
-      <div id="route-transition" aria-hidden="true" />
-      <ScrollToTop />
-      <RouteTransition />
-      <Outlet />
-    </>
   )
 }
 
 const router = createBrowserRouter([
   {
-    element: <AppShell />,
+    element: <Layout />,
+    errorElement: <RouteError />,
     children: [
-      {
-        element: <Layout />,
-        children: [
-          {
-            index: true,
-            element: (
-              <Suspense fallback={<PageFallback />}>
-                <Home />
-              </Suspense>
-            ),
-          },
-          {
-            path: 'events',
-            element: (
-              <Suspense fallback={<PageFallback />}>
-                <Events />
-              </Suspense>
-            ),
-          },
-          {
-            path: 'events/:id',
-            element: (
-              <Suspense fallback={<PageFallback />}>
-                <EventDetail />
-              </Suspense>
-            ),
-          },
-          {
-            path: '*',
-            element: <NotFound />,
-          },
-        ],
-      },
+      { index: true, element: <Home /> },
+      { path: 'events', element: <Events /> },
+      { path: 'events/:id', element: <EventDetail /> },
+      { path: '*', element: <NotFound /> },
     ],
   },
 ])

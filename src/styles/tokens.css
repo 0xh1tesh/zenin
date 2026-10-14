@@ -1,58 +1,75 @@
-@import '@fontsource-variable/fraunces/index.css';
-@import '@fontsource-variable/inter-tight/index.css';
-@import '@fontsource/jetbrains-mono/400.css';
+@font-face {
+  font-family: 'Unbounded';
+  src: url('/fonts/unbounded.woff2') format('woff2');
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter Tight';
+  src: url('/fonts/inter-tight.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
-  /* Surface */
-  --paper: #f4efe4;
-  --paper-2: #ebe4d3;
-  --card: #fbf8f1;
-  --ink: #15120f;
-  --ink-2: #4a443b;
-  --ink-3: #6b6458;
-  --line: #15120f1f;
-  --line-strong: #15120f;
+  color-scheme: dark;
 
-  /* Accents */
-  --vermilion: #d93a12;
-  --vermilion-ink: #a82b08;
-  --cobalt: #2236d6;
-  --saffron: #f2b01e;
-  --moss: #2f6b3b;
+  /* Render72 palette (#101010 #E6D5BD #D5360C #EAE6DE #226192 #EF8557), contrast-checked on --void */
+  --void: #101010;
+  --void-2: #181716;
+  --void-3: #211f1d;
+  --bone: #eae6de; /* body text, 15.3:1 */
+  --sand: #e6d5bd; /* headings, rules, rings, 13.2:1 */
+  --coral: #ef8557; /* accent text + primary CTA, 7.4:1 */
+  --vermilion: #d5360c; /* planet, glows, large display only */
+  --blue: #226192; /* nebula haze, decorative only */
+  --muted: #9c958a; /* secondary text, 6.4:1 */
+
+  --line: rgb(230 213 189 / 0.14);
+  --line-strong: rgb(230 213 189 / 0.34);
 
   /* Status */
-  --ok: #1f6b34;
-  --warn: #8a5a00;
-  --bad: #a82b08;
+  --ok: #8fd6a0;
+  --warn: #f2b01e;
+  --bad: #ff8a6b;
 
   /* Type */
-  --font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif;
-  --font-body: 'Inter Tight Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+  --font-display: 'Unbounded', 'Arial Black', system-ui, sans-serif;
+  --font-body: 'Inter Tight', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace;
 
-  /* Scale */
   --step--1: clamp(0.8rem, 0.78rem + 0.1vw, 0.875rem);
-  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
-  --step-1: clamp(1.25rem, 1.15rem + 0.5vw, 1.55rem);
-  --step-2: clamp(1.6rem, 1.4rem + 1vw, 2.2rem);
-  --step-3: clamp(2.2rem, 1.7rem + 2.5vw, 3.8rem);
-  --step-4: clamp(3rem, 2rem + 5vw, 7rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+  --step-1: clamp(1.2rem, 1.1rem + 0.5vw, 1.5rem);
+  --step-2: clamp(1.5rem, 1.25rem + 1.1vw, 2.25rem);
+  --step-3: clamp(2rem, 1.5rem + 2.4vw, 3.6rem);
+  --step-4: clamp(2.75rem, 1.6rem + 5.2vw, 6.5rem);
+  --step-5: clamp(3.25rem, 1rem + 11vw, 11rem);
 
-  /* Space / shape */
+  /* Space and shape */
   --gutter: clamp(1rem, 4vw, 2.5rem);
-  --maxw: 80rem;
-  --radius: 14px;
-  --radius-sm: 8px;
-  --shadow: 0 1px 0 var(--line), 0 12px 32px -18px #15120f40;
+  --maxw: 82rem;
+  --radius: 18px;
+  --radius-sm: 10px;
+  --rail-w: 6.5rem;
+  --topbar-h: 4.25rem;
+  --bottomnav-h: 4rem;
 
   /* Motion */
   --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
-  --dur: 240ms;
+  --dur: 260ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root { --dur: 0.01ms; }
-  *, *::before, *::after {
+  :root {
+    --dur: 0.01ms;
+  }
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;

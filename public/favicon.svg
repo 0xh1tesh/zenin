@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect width="32" height="32" rx="6" fill="#f4efe4"/>
-  <text x="4" y="24" font-family="Georgia, serif" font-size="22" font-weight="700" fill="#d93a12">K</text>
-  <text x="17" y="24" font-family="Georgia, serif" font-size="14" font-weight="400" fill="#15120f">'26</text>
+  <rect width="32" height="32" rx="8" fill="#101010"/>
+  <circle cx="16" cy="16" r="7" fill="#D5360C"/>
+  <ellipse cx="16" cy="16" rx="13" ry="4.2" stroke="#E6D5BD" stroke-width="1.6" transform="rotate(-20 16 16)"/>
 </svg>

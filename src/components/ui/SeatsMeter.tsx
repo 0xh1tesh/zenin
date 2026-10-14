@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react'
+import type { CSSProperties } from 'react'
 import type { EventSummary } from '../../types'
 import { fillRatio, seatsLeft } from '../../lib/format'
+import { cx } from '../../lib/cx'
 import './ui.css'
 
 interface SeatsMeterProps {
@@ -8,42 +9,27 @@ interface SeatsMeterProps {
   showLabel?: boolean
 }
 
-export default function SeatsMeter({ event, showLabel = false }: SeatsMeterProps) {
+export default function SeatsMeter({ event, showLabel = true }: SeatsMeterProps) {
   const ratio = fillRatio(event)
   const left = seatsLeft(event)
-  const barRef = useRef<HTMLDivElement>(null)
-
-  // Animate fill on mount — only transform/opacity
-  useEffect(() => {
-    const bar = barRef.current
-    if (!bar) return
-    bar.style.transform = 'scaleX(0)'
-    bar.style.transformOrigin = 'left'
-    const id = requestAnimationFrame(() => {
-      bar.style.transition = `transform 600ms var(--ease, cubic-bezier(0.2,0.7,0.1,1))`
-      bar.style.transform = `scaleX(${ratio})`
-    })
-    return () => cancelAnimationFrame(id)
-  }, [ratio])
-
-  const pct = Math.round(ratio * 100)
-  const urgency = ratio >= 0.9 ? 'ui-seats--urgent' : ratio >= 0.7 ? 'ui-seats--warn' : ''
+  const tone = ratio >= 0.9 ? 'urgent' : ratio >= 0.7 ? 'warn' : null
 
   return (
-    <div className={`ui-seats ${urgency}`}>
+    <div className={cx('ui-seats', tone && `ui-seats--${tone}`)}>
       <div
         className="ui-seats__track"
         role="meter"
-        aria-label={`${pct}% seats filled`}
-        aria-valuenow={pct}
+        aria-label="Seats taken"
         aria-valuemin={0}
-        aria-valuemax={100}
+        aria-valuemax={event.total_seats}
+        aria-valuenow={event.seats_filled}
+        aria-valuetext={`${event.seats_filled} of ${event.total_seats} seats taken`}
       >
-        <div ref={barRef} className="ui-seats__fill" />
+        <div className="ui-seats__fill" style={{ '--fill': ratio } as CSSProperties} />
       </div>
       {showLabel && (
-        <span className="ui-seats__label mono">
-          {left === 0 ? 'No seats left' : `${left} left`}
+        <span className="ui-seats__label">
+          {left === 0 ? 'Full' : ratio >= 0.9 ? `Only ${left} left` : `${left} left`}
         </span>
       )}
     </div>

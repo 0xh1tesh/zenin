@@ -1,99 +1,280 @@
 import type { EventDetail, EventSummary } from '../types'
+import { chaosMode, snapshotDisabled } from './chaos'
+import { ApiError, isAbortError, toApiError } from './errors'
+import { parseEventDetail, parseEventList, toEventDetail } from './validate'
 
-const BASE = 'https://render72.pages.dev/api/test'
-const TIMEOUT_MS = 8000
-const LIST_KEY = 'k26:events:v1'
-const detailKey = (id: string) => `k26:event:${id}:v1`
+export { ApiError } from './errors'
+export type { ApiErrorKind } from './errors'
 
-export type ApiErrorKind = 'not_found' | 'network' | 'timeout' | 'server' | 'parse'
+export const API_BASE = 'https://render72.pages.dev/api/test'
+export const MAX_ATTEMPTS = 3
+export const REQUEST_TIMEOUT_MS = 6000
+export const FRESH_MS = 5 * 60_000
+const BACKOFF_MS = [400, 1200]
+const CHAOS_TIMEOUT_MS = 2000
+const CACHE_PREFIX = 'z26:v2:'
+const SNAPSHOT_URL = '/events-snapshot.json'
 
-export class ApiError extends Error {
-  readonly kind: ApiErrorKind
-  readonly status?: number
-  constructor(kind: ApiErrorKind, message: string, status?: number) {
-    super(message)
-    this.name = 'ApiError'
-    this.kind = kind
-    this.status = status
-  }
+export type Source = 'network' | 'cache' | 'snapshot'
+
+export interface Loaded<T> {
+  data: T
+  /** True when the data is older than the freshness window or came from a fallback. */
+  stale: boolean
+  source: Source
+  fetchedAt: number
 }
 
-async function request<T>(path: string, signal?: AbortSignal): Promise<T> {
-  const ctrl = new AbortController()
-  const timer = setTimeout(() => ctrl.abort('timeout'), TIMEOUT_MS)
-  const onAbort = () => ctrl.abort('aborted')
-  signal?.addEventListener('abort', onAbort)
-  try {
-    const res = await fetch(`${BASE}${path}`, {
-      headers: { Accept: 'application/json' },
-      signal: ctrl.signal,
-    })
-    if (res.status === 404) throw new ApiError('not_found', 'Event not found.', 404)
-    if (!res.ok) throw new ApiError('server', `Server responded ${res.status}.`, res.status)
-    try {
-      return (await res.json()) as T
-    } catch {
-      throw new ApiError('parse', 'The server sent an unreadable response.')
-    }
-  } catch (err) {
-    if (err instanceof ApiError) throw err
-    if (ctrl.signal.aborted && ctrl.signal.reason === 'timeout') {
-      throw new ApiError('timeout', 'The request took too long.')
-    }
-    if (err instanceof DOMException && err.name === 'AbortError') throw err
-    throw new ApiError('network', 'Could not reach the server.')
-  } finally {
-    clearTimeout(timer)
-    signal?.removeEventListener('abort', onAbort)
-  }
+export interface Attempt {
+  n: number
+  max: number
 }
 
-function readCache<T>(key: string): T | null {
+export interface FetchOptions {
+  onAttempt?: (attempt: Attempt) => void
+  /** Skip the fresh-cache shortcut and hit the network. */
+  force?: boolean
+}
+
+/* ─── Cache: memory first, localStorage second (both best-effort) ───────── */
+
+interface Entry<T> {
+  at: number
+  data: T
+}
+
+const memory = new Map<string, Entry<unknown>>()
+
+function readEntry<T>(key: string): Entry<T> | null {
+  const hit = memory.get(key)
+  if (hit) return hit as Entry<T>
   try {
-    const raw = localStorage.getItem(key)
-    return raw ? (JSON.parse(raw) as T) : null
+    const raw = localStorage.getItem(CACHE_PREFIX + key)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as Entry<T>
+    if (typeof parsed?.at !== 'number' || parsed.data === undefined) return null
+    memory.set(key, parsed)
+    return parsed
   } catch {
     return null
   }
 }
 
-function writeCache(key: string, value: unknown) {
+function writeEntry<T>(key: string, data: T) {
+  const entry: Entry<T> = { at: Date.now(), data }
+  memory.set(key, entry)
   try {
-    localStorage.setItem(key, JSON.stringify(value))
+    localStorage.setItem(CACHE_PREFIX + key, JSON.stringify(entry))
   } catch {
     /* storage unavailable or full: caching is best-effort */
   }
 }
 
-export interface Loaded<T> {
-  data: T
-  /** true when the network failed and we are showing the last good copy */
-  stale: boolean
+const isFresh = (at: number) => Date.now() - at <= FRESH_MS
+
+function fromEntry<T>(entry: Entry<T>): Loaded<T> {
+  return { data: entry.data, stale: !isFresh(entry.at), source: 'cache', fetchedAt: entry.at }
 }
 
-export async function fetchEvents(signal?: AbortSignal): Promise<Loaded<EventSummary[]>> {
+/** Synchronous read for instant first paint. Disabled while chaos mode is on. */
+export function peekEvents(): Loaded<EventSummary[]> | null {
+  if (chaosMode()) return null
+  const entry = readEntry<EventSummary[]>('list')
+  return entry ? fromEntry(entry) : null
+}
+
+export function peekEvent(id: string): Loaded<EventDetail> | null {
+  if (chaosMode()) return null
+  const entry = readEntry<EventDetail>(`event:${id}`)
+  return entry ? fromEntry(entry) : null
+}
+
+/** Summary for an event from the cached list, if the list has been loaded before. */
+export function peekSummary(id: string): EventSummary | null {
+  const list = readEntry<EventSummary[]>('list')
+  return list?.data.find((e) => e.id === id) ?? null
+}
+
+/* ─── Network with timeout + retry/backoff ──────────────────────────────── */
+
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
+
+async function attemptOnce(path: string): Promise<unknown> {
+  const chaos = chaosMode()
+  if (chaos === 'offline') {
+    await sleep(150)
+    throw new ApiError('network', 'Could not reach the server.')
+  }
+  if (chaos === '500') {
+    await sleep(150)
+    throw new ApiError('server', 'Server responded 500.', 500)
+  }
+  if (chaos === 'timeout') {
+    await sleep(CHAOS_TIMEOUT_MS)
+    throw new ApiError('timeout', 'The request took too long.')
+  }
+  if (chaos === 'malformed') return { unexpected: true }
+  if (chaos === 'empty') {
+    if (path === '/events') return { events: [] }
+    throw new ApiError('not_found', 'Event not found.', 404)
+  }
+
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS)
   try {
-    const body = await request<{ events: EventSummary[] }>('/events', signal)
-    writeCache(LIST_KEY, body.events)
-    return { data: body.events, stale: false }
+    const res = await fetch(API_BASE + path, { signal: ctrl.signal })
+    if (res.status === 404) throw new ApiError('not_found', 'Event not found.', 404)
+    if (!res.ok) throw new ApiError('server', `Server responded ${res.status}.`, res.status)
+    try {
+      return await res.json()
+    } catch {
+      throw new ApiError('parse', 'The server sent an unreadable response.')
+    }
   } catch (err) {
-    if (err instanceof DOMException && err.name === 'AbortError') throw err
-    const cached = readCache<EventSummary[]>(LIST_KEY)
-    if (cached) return { data: cached, stale: true }
-    throw err
+    if (err instanceof ApiError) throw err
+    if (ctrl.signal.aborted) throw new ApiError('timeout', 'The request took too long.')
+    throw new ApiError('network', 'Could not reach the server.')
+  } finally {
+    clearTimeout(timer)
   }
 }
 
-export async function fetchEvent(id: string, signal?: AbortSignal): Promise<Loaded<EventDetail>> {
-  try {
-    const body = await request<{ event: EventDetail }>(`/events/${encodeURIComponent(id)}`, signal)
-    writeCache(detailKey(id), body.event)
-    return { data: body.event, stale: false }
-  } catch (err) {
-    if (err instanceof DOMException && err.name === 'AbortError') throw err
-    if (err instanceof ApiError && err.kind === 'not_found') throw err
-    const cached = readCache<EventDetail>(detailKey(id))
-    if (cached) return { data: cached, stale: true }
-    throw err
+const backoffDelay = (attempt: number) => BACKOFF_MS[attempt - 1] * (0.75 + Math.random() * 0.5)
+
+async function requestWithRetry(path: string, onAttempt?: (a: Attempt) => void): Promise<unknown> {
+  for (let n = 1; ; n++) {
+    onAttempt?.({ n, max: MAX_ATTEMPTS })
+    try {
+      return await attemptOnce(path)
+    } catch (err) {
+      const apiErr = toApiError(err)
+      if (!apiErr.retryable || n >= MAX_ATTEMPTS) throw apiErr
+      await sleep(backoffDelay(n))
+    }
   }
+}
+
+/* ─── Share one in-flight request between components ────────────────────── */
+
+interface Flight {
+  promise: Promise<Loaded<unknown>>
+  listeners: Set<(a: Attempt) => void>
+  last?: Attempt
+}
+
+const flights = new Map<string, Flight>()
+
+function runShared<T>(
+  key: string,
+  run: (onAttempt: (a: Attempt) => void) => Promise<Loaded<T>>,
+  onAttempt?: (a: Attempt) => void,
+): Promise<Loaded<T>> {
+  let flight = flights.get(key)
+  if (!flight) {
+    const listeners = new Set<(a: Attempt) => void>()
+    const created: Flight = {
+      listeners,
+      promise: run((a) => {
+        created.last = a
+        listeners.forEach((l) => l(a))
+      }).finally(() => flights.delete(key)),
+    }
+    flights.set(key, created)
+    flight = created
+  }
+  if (onAttempt) {
+    flight.listeners.add(onAttempt)
+    if (flight.last) onAttempt(flight.last)
+  }
+  return flight.promise as Promise<Loaded<T>>
+}
+
+/* ─── Offline snapshot (last resort for first-time visitors) ────────────── */
+
+interface Snapshot {
+  at: number
+  events: EventSummary[]
+  details: Map<string, EventDetail>
+}
+
+let snapshotPromise: Promise<Snapshot | null> | null = null
+
+function loadSnapshot(): Promise<Snapshot | null> {
+  if (snapshotDisabled()) return Promise.resolve(null)
+  snapshotPromise ??= fetch(SNAPSHOT_URL)
+    .then((res) => (res.ok ? res.json() : null))
+    .then((body: unknown): Snapshot | null => {
+      const rec = body as { generated_at?: string; events?: unknown; details?: Record<string, unknown> } | null
+      if (!rec) return null
+      const events = parseEventList({ events: rec.events })
+      if (events.length === 0) return null
+      const details = new Map<string, EventDetail>()
+      for (const raw of Object.values(rec.details ?? {})) {
+        const detail = toEventDetail(raw)
+        if (detail) details.set(detail.id, detail)
+      }
+      const at = rec.generated_at ? Date.parse(rec.generated_at) : NaN
+      return { at: Number.isNaN(at) ? Date.now() : at, events, details }
+    })
+    .catch(() => null)
+  return snapshotPromise
+}
+
+/* ─── Public API ────────────────────────────────────────────────────────── */
+
+async function loadList(onAttempt: (a: Attempt) => void): Promise<Loaded<EventSummary[]>> {
+  try {
+    const data = parseEventList(await requestWithRetry('/events', onAttempt))
+    if (!chaosMode()) writeEntry('list', data)
+    return { data, stale: false, source: 'network', fetchedAt: Date.now() }
+  } catch (err) {
+    const cached = readEntry<EventSummary[]>('list')
+    if (cached) return { data: cached.data, stale: true, source: 'cache', fetchedAt: cached.at }
+    const snapshot = await loadSnapshot()
+    if (snapshot) return { data: snapshot.events, stale: true, source: 'snapshot', fetchedAt: snapshot.at }
+    throw toApiError(err)
+  }
+}
+
+export function fetchEvents(opts: FetchOptions = {}): Promise<Loaded<EventSummary[]>> {
+  const cached = chaosMode() ? null : readEntry<EventSummary[]>('list')
+  if (cached && !opts.force && isFresh(cached.at)) return Promise.resolve(fromEntry(cached))
+  return runShared('list', loadList, opts.onAttempt)
+}
+
+async function loadDetail(id: string, onAttempt: (a: Attempt) => void): Promise<Loaded<EventDetail>> {
+  try {
+    const data = parseEventDetail(await requestWithRetry(`/events/${encodeURIComponent(id)}`, onAttempt))
+    if (!chaosMode()) writeEntry(`event:${id}`, data)
+    return { data, stale: false, source: 'network', fetchedAt: Date.now() }
+  } catch (err) {
+    const apiErr = toApiError(err)
+    if (apiErr.kind === 'not_found') throw apiErr
+    const cached = readEntry<EventDetail>(`event:${id}`)
+    if (cached) return { data: cached.data, stale: true, source: 'cache', fetchedAt: cached.at }
+    const snapshot = await loadSnapshot()
+    const fromSnapshot = snapshot?.details.get(id)
+    if (snapshot && fromSnapshot) return { data: fromSnapshot, stale: true, source: 'snapshot', fetchedAt: snapshot.at }
+    throw apiErr
+  }
+}
+
+export function fetchEvent(id: string, opts: FetchOptions = {}): Promise<Loaded<EventDetail>> {
+  const key = `event:${id}`
+  const cached = chaosMode() ? null : readEntry<EventDetail>(key)
+  if (cached && !opts.force && isFresh(cached.at)) return Promise.resolve(fromEntry(cached))
+  return runShared(key, (onAttempt) => loadDetail(id, onAttempt), opts.onAttempt)
+}
+
+const prefetched = new Set<string>()
+
+/** Warm the detail cache on hover/focus so the click feels instant. */
+export function prefetchEvent(id: string) {
+  if (prefetched.has(id) || chaosMode()) return
+  const cached = readEntry<EventDetail>(`event:${id}`)
+  if (cached && isFresh(cached.at)) return
+  prefetched.add(id)
+  fetchEvent(id).catch((err: unknown) => {
+    if (!isAbortError(err)) prefetched.delete(id)
+  })
 }

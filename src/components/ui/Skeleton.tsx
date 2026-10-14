@@ -1,49 +1,46 @@
-import React from 'react'
+import type { CSSProperties } from 'react'
+import type { Attempt } from '../../lib/api'
+import { cx } from '../../lib/cx'
 import './ui.css'
 
-/* ----------------------------------------------------------
-   Skeleton — generic shimmer block
-   ---------------------------------------------------------- */
-interface SkeletonProps {
-  className?: string
-  style?: React.CSSProperties
+export function Skeleton({ className, style }: { className?: string; style?: CSSProperties }) {
+  return <div className={cx('ui-skeleton', className)} style={style} aria-hidden="true" />
 }
 
-export function Skeleton({ className = '', style }: SkeletonProps) {
+/** Mirrors the default EventCard layout so nothing shifts when data arrives. */
+export function EventCardSkeleton() {
   return (
-    <div
-      className={`ui-skeleton ${className}`.trim()}
-      style={style}
-      aria-hidden="true"
-    />
+    <div className="ecard-skel" aria-hidden="true">
+      <Skeleton className="ecard-skel__media" />
+      <div className="ecard-skel__body">
+        <Skeleton className="ecard-skel__line ecard-skel__line--short" />
+        <Skeleton className="ecard-skel__line ecard-skel__line--title" />
+        <Skeleton className="ecard-skel__line" />
+        <div className="ecard-skel__foot">
+          <Skeleton className="ecard-skel__line ecard-skel__line--short" />
+          <Skeleton className="ecard-skel__line ecard-skel__line--short" />
+        </div>
+      </div>
+    </div>
   )
 }
 
-/* ----------------------------------------------------------
-   EventCardSkeleton — mirrors EventCard layout (ticket-stub)
-   ---------------------------------------------------------- */
-export function EventCardSkeleton() {
+export function EventGridSkeleton({ count = 6 }: { count?: number }) {
   return (
-    <article className="ui-card-skeleton" aria-hidden="true" aria-label="Loading event">
-      {/* Cover image area */}
-      <Skeleton className="ui-card-skeleton__image" />
-      {/* Body */}
-      <div className="ui-card-skeleton__body">
-        <Skeleton className="ui-card-skeleton__category" />
-        <Skeleton className="ui-card-skeleton__title" />
-        <Skeleton className="ui-card-skeleton__title ui-card-skeleton__title--short" />
-        <Skeleton className="ui-card-skeleton__blurb" />
-        <div className="ui-card-skeleton__meta">
-          <Skeleton className="ui-card-skeleton__badge" />
-          <Skeleton className="ui-card-skeleton__price" />
-        </div>
-        {/* Perforation divider */}
-        <div className="ui-card-skeleton__perf" />
-        <div className="ui-card-skeleton__footer">
-          <Skeleton className="ui-card-skeleton__date" />
-          <Skeleton className="ui-card-skeleton__seats" />
-        </div>
-      </div>
-    </article>
+    <div className="ecard-grid" role="status" aria-label="Loading events">
+      {Array.from({ length: count }, (_, i) => (
+        <EventCardSkeleton key={i} />
+      ))}
+    </div>
+  )
+}
+
+/** Visible only after the first attempt fails: tells the visitor we are retrying. */
+export function RetryNote({ attempt }: { attempt: Attempt | null }) {
+  if (!attempt || attempt.n < 2) return null
+  return (
+    <p className="ui-retry-note" role="status">
+      Signal weak, retrying {attempt.n}/{attempt.max}…
+    </p>
   )
 }
