@@ -31,10 +31,7 @@ function LandingPadComponent({ isLanded, isVisible, onLaunchAgain }: LandingPadP
   if (!isVisible) return null
 
   return (
-    <div
-      className={`rocket-dock ${isLanded ? 'is-landed' : ''}`}
-      aria-hidden={!isLanded ? 'true' : undefined}
-    >
+    <div className={`rocket-dock ${isLanded ? 'is-landed' : ''}`}>
       {/* Visual docking pad line & crater cradle */}
       <div className="rocket-dock__cradle" aria-hidden="true">
         <svg
@@ -94,22 +91,25 @@ function LandingPadComponent({ isLanded, isVisible, onLaunchAgain }: LandingPadP
       </div>
 
       {/* Touchdown indicator & Launch again button */}
-      <div className="rocket-dock__actions">
-        <span className="rocket-dock__status mono" aria-hidden="true">
-          Touchdown
-        </span>
-        <button
-          type="button"
-          className="rocket-dock__btn mono"
-          aria-label="Back to top"
-          onClick={onLaunchAgain}
-        >
-          <span className="rocket-dock__btn-icon" aria-hidden="true">
-            ▲
+      {/* The button exists only once landed, so it is never focusable while invisible. */}
+      {isLanded && (
+        <div className="rocket-dock__actions">
+          <span className="rocket-dock__status mono" aria-hidden="true">
+            Touchdown
           </span>
-          Launch again
-        </button>
-      </div>
+          <button
+            type="button"
+            className="rocket-dock__btn mono"
+            aria-label="Launch again, back to top"
+            onClick={onLaunchAgain}
+          >
+            <span className="rocket-dock__btn-icon" aria-hidden="true">
+              ▲
+            </span>
+            Launch again
+          </button>
+        </div>
+      )}
     </div>
   )
 }

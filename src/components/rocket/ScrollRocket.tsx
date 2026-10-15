@@ -28,6 +28,8 @@ import {
 import { RocketCraft } from './RocketCraft'
 import './rocket.css'
 
+const DOCK_VISIBLE_AT = 0.93
+
 /**
  * ScrollRocket: A code-drawn cosmic rocket that travels with the visitor
  * along a gentle S-curve track, orienting with scroll direction, responding to
@@ -65,6 +67,14 @@ export default function ScrollRocket() {
   const isScrollingUpRef = useRef(false)
   const dimsRef = useRef(dims)
   dimsRef.current = dims
+
+  // React state changes only when the dock flips, never on every animation frame.
+  const dockStateRef = useRef({ landed: false, visible: false })
+  const syncDockState = useCallback((landed: boolean, visible: boolean) => {
+    if (dockStateRef.current.landed !== landed) setIsLandedState(landed)
+    if (dockStateRef.current.visible !== visible) setIsDockVisible(visible)
+    dockStateRef.current = { landed, visible }
+  }, [])
 
   // Particle pool allocated once
   const particlePoolRef = useRef(createParticlePool(MAX_PARTICLES_DESKTOP))
@@ -134,8 +144,7 @@ export default function ScrollRocket() {
 
     // Check landing threshold
     const landed = isLanded(currP, LANDING_THRESHOLD)
-    setIsLandedState(landed)
-    setIsDockVisible(currP > 0.93)
+    syncDockState(landed, currP > DOCK_VISIBLE_AT)
 
     // Compute path point and tangent
     const pt = computePathPoint(currP, currentDims)
@@ -200,7 +209,7 @@ export default function ScrollRocket() {
     } else {
       scheduleFrame()
     }
-  }, [isLaunching])
+  }, [isLaunching, syncDockState])
 
   const scheduleFrame = useCallback(() => {
     if (typeof document !== 'undefined' && document.hidden) return
@@ -246,8 +255,7 @@ export default function ScrollRocket() {
           moverRef.current.style.transform = `translate3d(${pt.x}px, ${pt.y}px, 0) rotate(${angle}deg)`
         }
         const landed = isLanded(targetProgressRef.current, LANDING_THRESHOLD)
-        setIsLandedState(landed)
-        setIsDockVisible(targetProgressRef.current > 0.93)
+        syncDockState(landed, targetProgressRef.current > DOCK_VISIBLE_AT)
       } else {
         scheduleFrame()
       }
@@ -263,7 +271,7 @@ export default function ScrollRocket() {
         rafIdRef.current = null
       }
     }
-  }, [reducedMotion, scheduleFrame])
+  }, [reducedMotion, scheduleFrame, syncDockState])
 
   // Pause rAF loop when tab is hidden, resume when visible
   useEffect(() => {
@@ -311,11 +319,8 @@ export default function ScrollRocket() {
   }, [])
 
   return (
-    <div
-      ref={containerRef}
-      className="rocket-overlay"
-      aria-hidden="true"
-    >
+    // Not aria-hidden as a whole: the dock holds a real, focusable button. Each decorative child hides itself.
+    <div ref={containerRef} className="rocket-overlay">
       {/* Flight trajectory lines */}
       <svg
         className="rocket-track-svg"
