@@ -1,4 +1,7 @@
 @import './craft.css';
+@import './dock.css';
+@import './beacons.css';
+@import './hud.css';
 
 /* ─── ScrollRocket Fixed Overlay ─────────────────────────────────────── */
 .rocket-overlay {
@@ -6,7 +9,7 @@
   top: 0;
   right: 0;
   bottom: 0;
-  /* The width comes inline from the flight geometry so the craft and the drawn track share one coordinate space. */
+  /* Width comes inline from flight geometry so the craft and track share one coordinate space. */
   width: 90px;
   max-width: 100vw;
   z-index: 35;

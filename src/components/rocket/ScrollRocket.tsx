@@ -7,17 +7,25 @@ import {
   computePathDimensions,
   computePathPoint,
   computePathTangent,
+  computeReentryHeat,
   computeRocketAngle,
+  computeSeparationState,
+  DOCK_THRESHOLD,
+  formatAltitude,
   generateSvgPathString,
+  getActiveSectionTitle,
   isLanded,
   LANDING_THRESHOLD,
   lerp,
   lerpAngle,
   type PathDimensions,
+  REENTRY_START_PROGRESS,
   shouldEmitParticle,
   smoothVelocity,
 } from './flight'
 import { LandingPad } from './LandingPad'
+import { MissionHud } from './MissionHud'
+import { OrbitalDock } from './OrbitalDock'
 import {
   createParticlePool,
   emitParticle,
@@ -25,42 +33,44 @@ import {
   MAX_PARTICLES_MOBILE,
   updateParticles,
 } from './particles'
+import { ParticleTrail } from './ParticleTrail'
 import { RocketCraft } from './RocketCraft'
+import { useWaypoints } from './useWaypoints'
+import { WaypointBeacons } from './WaypointBeacons'
 import './rocket.css'
 
 const DOCK_VISIBLE_AT = 0.93
-/** Easing of the drawn position toward its target per frame. */
 const POS_EASE = 0.35
-/** y of the pad's landing line inside its 54x18 SVG. */
 const PAD_SURFACE_Y = 14
 
-/**
- * ScrollRocket: A code-drawn cosmic rocket that travels with the visitor
- * along a gentle S-curve track, orienting with scroll direction, responding to
- * scroll velocity with dynamic flame and particle trail, and docking at touchdown.
- */
 export default function ScrollRocket() {
   const location = useLocation()
   const reducedMotion = useReducedMotion()
 
   const [isLandedState, setIsLandedState] = useState(false)
   const [isDockVisible, setIsDockVisible] = useState(false)
+  const [isDockedState, setIsDockedState] = useState(true)
+  const [isSeparatedState, setIsSeparatedState] = useState(false)
+  const [justSeparated, setJustSeparated] = useState(false)
   const [isLaunching, setIsLaunching] = useState(false)
-  const [dims, setDims] = useState<PathDimensions>(() =>
-    computePathDimensions(
-      typeof window !== 'undefined' ? window.innerWidth : 1200,
-      typeof window !== 'undefined' ? window.innerHeight : 800,
-      typeof window !== 'undefined' ? window.innerWidth < 640 : false
-    )
-  )
+  const [activeBeaconIdx, setActiveBeaconIdx] = useState(0)
+  const [ripplingIdx, setRipplingIdx] = useState<number | null>(null)
+  const { beacons, updateBeacons } = useWaypoints(location.pathname)
 
-  // DOM element references
+  const [dims, setDims] = useState<PathDimensions>(() => {
+    const w = typeof window !== 'undefined' ? window.innerWidth : 1200
+    const h = typeof window !== 'undefined' ? window.innerHeight : 800
+    return computePathDimensions(w, h, w < 640)
+  })
+
   const containerRef = useRef<HTMLDivElement>(null)
   const moverRef = useRef<HTMLDivElement>(null)
   const fgPathRef = useRef<SVGPathElement>(null)
+  const hudContainerRef = useRef<HTMLDivElement>(null)
+  const hudAltRef = useRef<HTMLSpanElement>(null)
+  const hudSectionRef = useRef<HTMLDivElement>(null)
   const particleElsRef = useRef<(HTMLSpanElement | null)[]>([])
 
-  // Animation & physics state refs (no React re-renders on frame ticks)
   const rafIdRef = useRef<number | null>(null)
   const targetProgressRef = useRef(0)
   const currentProgressRef = useRef(0)
@@ -69,10 +79,15 @@ export default function ScrollRocket() {
   const lastScrollTimeRef = useRef(0)
   const velocityRef = useRef(0)
   const isScrollingUpRef = useRef(false)
+  const isDockedRef = useRef(true)
+  const isSeparatedRef = useRef(false)
+  const activeBeaconIdxRef = useRef(0)
+  const beaconsRef = useRef(beacons)
+  beaconsRef.current = beacons
   const dimsRef = useRef(dims)
   dimsRef.current = dims
 
-  // React state changes only when the dock flips, never on every animation frame.
+  const hudIdleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const dockStateRef = useRef({ landed: false, visible: false })
   const syncDockState = useCallback((landed: boolean, visible: boolean) => {
     if (dockStateRef.current.landed !== landed) setIsLandedState(landed)
@@ -80,152 +95,147 @@ export default function ScrollRocket() {
     dockStateRef.current = { landed, visible }
   }, [])
 
-  // Last drawn craft position, eased separately so the hop from track to pad is smooth.
   const posRef = useRef<{ x: number; y: number } | null>(null)
 
-  /** Where the craft stands on the landing pad, in overlay coordinates; null until the pad is rendered. */
   const padAnchor = useCallback((): { x: number; y: number } | null => {
-    const overlay = containerRef.current
-    const pad = overlay?.querySelector('.rocket-dock__svg')
-    if (!overlay || !pad) return null
-    const padBox = pad.getBoundingClientRect()
-    const overlayBox = overlay.getBoundingClientRect()
-    const halfCraft = window.innerWidth < 640 ? 19 : 24
-    return {
-      x: padBox.left - overlayBox.left + padBox.width / 2,
-      y: padBox.top - overlayBox.top + PAD_SURFACE_Y - halfCraft,
-    }
+    const pad = containerRef.current?.querySelector('.rocket-dock__svg')
+    if (!containerRef.current || !pad) return null
+    const pBox = pad.getBoundingClientRect()
+    const oBox = containerRef.current.getBoundingClientRect()
+    const halfH = window.innerWidth < 640 ? 19 : 24
+    return { x: pBox.left - oBox.left + pBox.width / 2, y: pBox.top - oBox.top + PAD_SURFACE_Y - halfH }
   }, [])
 
-  // Particle pool allocated once
   const particlePoolRef = useRef(createParticlePool(MAX_PARTICLES_DESKTOP))
-
-  // Path geometry data string
   const pathD = useMemo(() => generateSvgPathString(dims, 60), [dims])
+  const dockPoint = useMemo(() => computePathPoint(0, dims), [dims])
 
-  // Setup stroke-dasharray on trajectory foreground path when path changes
   useLayoutEffect(() => {
     if (fgPathRef.current) {
       try {
-        const totalLength = fgPathRef.current.getTotalLength()
-        fgPathRef.current.style.strokeDasharray = `${totalLength} ${totalLength}`
-        fgPathRef.current.style.strokeDashoffset = `${totalLength * (1 - currentProgressRef.current)}`
+        const total = fgPathRef.current.getTotalLength()
+        fgPathRef.current.style.strokeDasharray = `${total} ${total}`
+        fgPathRef.current.style.strokeDashoffset = `${total * (1 - currentProgressRef.current)}`
       } catch {
-        // Fallback if SVG geometry is not yet measured
+        /* Geometry not ready */
       }
     }
   }, [pathD])
 
-  // Responsive dimension updates & ResizeObserver on document.body
   useEffect(() => {
-    const updateDimensions = () => {
-      const w = window.innerWidth
-      const h = window.innerHeight
-      const isMobile = w < 640
-      const nextDims = computePathDimensions(w, h, isMobile)
-      setDims(nextDims)
-    }
-
-    updateDimensions()
-    window.addEventListener('resize', updateDimensions, { passive: true })
-
-    const observer = new ResizeObserver(() => {
-      // Recalculate target progress when document body height changes (async content)
+    const onResize = () => setDims(computePathDimensions(window.innerWidth, window.innerHeight, window.innerWidth < 640))
+    onResize()
+    window.addEventListener('resize', onResize, { passive: true })
+    const obs = new ResizeObserver(() => {
       const scrollY = window.scrollY || window.pageYOffset || 0
-      const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight || 0
-      const innerHeight = window.innerHeight || 0
-      targetProgressRef.current = calculateScrollProgress(scrollY, scrollHeight, innerHeight)
+      const scrollH = document.documentElement.scrollHeight || document.body.scrollHeight || 0
+      targetProgressRef.current = calculateScrollProgress(scrollY, scrollH, window.innerHeight || 0)
+      updateBeacons()
       scheduleFrame()
     })
-
-    if (document.body) {
-      observer.observe(document.body)
-    }
-
+    if (document.body) obs.observe(document.body)
     return () => {
-      window.removeEventListener('resize', updateDimensions)
-      observer.disconnect()
+      window.removeEventListener('resize', onResize)
+      obs.disconnect()
     }
-  }, [])
+  }, [updateBeacons])
 
-  // Single rAF frame execution
   const tick = useCallback(() => {
     rafIdRef.current = null
-    const currentDims = dimsRef.current
+    const curDims = dimsRef.current
     const targetP = targetProgressRef.current
-    let currP = currentProgressRef.current
-
-    // Linear easing (settles within ~200-250ms)
-    currP = lerp(currP, targetP, 0.18)
+    const currP = lerp(currentProgressRef.current, targetP, 0.18)
     currentProgressRef.current = currP
 
-    // Smooth velocity decay
     velocityRef.current = smoothVelocity(velocityRef.current, 0, 0.12)
     const vel = velocityRef.current
 
-    // Check landing threshold
     const landed = isLanded(currP, LANDING_THRESHOLD)
     syncDockState(landed, currP > DOCK_VISIBLE_AT)
 
-    // Compute path point and tangent
-    // Once landed the craft leaves the track, glides onto the pad and stands upright.
+    const docked = currP <= DOCK_THRESHOLD
+    if (docked !== isDockedRef.current) {
+      isDockedRef.current = docked
+      setIsDockedState(docked)
+    }
+
+    const nextSeparated = computeSeparationState(currP, isSeparatedRef.current)
+    if (nextSeparated !== isSeparatedRef.current) {
+      isSeparatedRef.current = nextSeparated
+      setIsSeparatedState(nextSeparated)
+      if (nextSeparated && !reducedMotion) {
+        setJustSeparated(true)
+        setTimeout(() => setJustSeparated(false), 900)
+      }
+    }
+
+    const curBeacons = beaconsRef.current
+    if (curBeacons.length > 0) {
+      const nextIdx = curBeacons.findIndex((b) => currP < b.progress)
+      const resIdx = nextIdx === -1 ? curBeacons.length : nextIdx
+      if (resIdx !== activeBeaconIdxRef.current) {
+        const crossed = resIdx > activeBeaconIdxRef.current ? resIdx - 1 : null
+        activeBeaconIdxRef.current = resIdx
+        setActiveBeaconIdx(resIdx)
+        if (crossed !== null && !reducedMotion) {
+          setRipplingIdx(crossed)
+          setTimeout(() => setRipplingIdx(null), 650)
+        }
+      }
+    }
+
     const pad = landed ? padAnchor() : null
-    const target = pad ?? computePathPoint(currP, currentDims)
+    const target = pad ?? computePathPoint(currP, curDims)
     const prev = posRef.current ?? target
     const pt = { x: lerp(prev.x, target.x, POS_EASE), y: lerp(prev.y, target.y, POS_EASE) }
     posRef.current = pt
-    const tangent = computePathTangent(currP, currentDims)
+    const tangent = computePathTangent(currP, curDims)
     const targetAngle = pad ? 0 : computeRocketAngle(tangent.dx, tangent.dy, isScrollingUpRef.current)
     const nextAngle = lerpAngle(currentAngleRef.current, targetAngle, 0.18)
     currentAngleRef.current = nextAngle
 
-    // Update rocket position & orientation directly via transform
     if (moverRef.current) {
-      moverRef.current.style.transform = `translate3d(${pt.x}px, ${pt.y}px, 0) rotate(${nextAngle.toFixed(1)}deg)`
-    }
-
-    // Update trajectory foreground stroke-dashoffset
-    if (fgPathRef.current) {
-      try {
-        const totalLength = fgPathRef.current.getTotalLength()
-        const offset = totalLength * (1 - currP)
-        fgPathRef.current.style.strokeDashoffset = `${offset.toFixed(1)}`
-      } catch {
-        // SVG length fallback
+      moverRef.current.style.transform = `translate3d(${pt.x.toFixed(1)}px, ${pt.y.toFixed(1)}px, 0) rotate(${nextAngle.toFixed(1)}deg)`
+      const flame = computeFlameScale(vel, landed, isLaunching)
+      const flameEl = moverRef.current.querySelector<SVGGElement>('.rocket-flame-group')
+      if (flameEl) {
+        flameEl.style.transform = `scaleY(${flame.scaleY.toFixed(2)}) scaleX(${flame.scaleX.toFixed(2)})`
+        flameEl.style.opacity = `${flame.opacity.toFixed(2)}`
+      }
+      const reentryEl = moverRef.current.querySelector<SVGPathElement>('.rocket-reentry-glow')
+      if (reentryEl) {
+        const heat = reducedMotion ? 0 : computeReentryHeat(currP, vel, REENTRY_START_PROGRESS, landed)
+        reentryEl.style.opacity = heat > 0 ? heat.toFixed(2) : '0'
+      }
+      const speedLinesEl = moverRef.current.querySelector<HTMLDivElement>('.rocket-speed-lines')
+      if (speedLinesEl) {
+        speedLinesEl.style.opacity = !reducedMotion && !landed && vel > 0.65 ? Math.min(1, (vel - 0.65) / 0.8).toFixed(2) : '0'
       }
     }
 
-    // Dynamic flame scale update
-    const flame = computeFlameScale(vel, landed, isLaunching)
-    const flameEl = moverRef.current?.querySelector<SVGGElement>('.rocket-flame-group')
-    if (flameEl) {
-      flameEl.style.transform = `scaleY(${flame.scaleY.toFixed(2)}) scaleX(${flame.scaleX.toFixed(2)})`
-      flameEl.style.opacity = `${flame.opacity.toFixed(2)}`
+    if (hudContainerRef.current) {
+      hudContainerRef.current.style.transform = `translate3d(${(pt.x - 18).toFixed(1)}px, ${pt.y.toFixed(1)}px, 0) translate(-100%, -50%)`
+      if (hudAltRef.current) hudAltRef.current.textContent = formatAltitude(currP)
+      if (hudSectionRef.current) hudSectionRef.current.textContent = getActiveSectionTitle(curBeacons, currP, 'ORBIT')
     }
 
-    // Particle emissions & physics
+    if (fgPathRef.current) {
+      try {
+        const total = fgPathRef.current.getTotalLength()
+        fgPathRef.current.style.strokeDashoffset = `${(total * (1 - currP)).toFixed(1)}`
+      } catch {
+        /* Fallback */
+      }
+    }
+
     const isMobile = window.innerWidth < 640
     const maxParticles = isMobile ? MAX_PARTICLES_MOBILE : MAX_PARTICLES_DESKTOP
 
-    if (shouldEmitParticle(vel, landed, isMobile, 0, maxParticles)) {
-      emitParticle(
-        particlePoolRef.current,
-        maxParticles,
-        pt.x,
-        pt.y,
-        nextAngle,
-        isScrollingUpRef.current,
-        isMobile
-      )
+    if (!reducedMotion && shouldEmitParticle(vel, landed, isMobile, 0, maxParticles)) {
+      emitParticle(particlePoolRef.current, maxParticles, pt.x, pt.y, nextAngle, isScrollingUpRef.current, isMobile)
     }
 
-    const activeCount = updateParticles(
-      particlePoolRef.current,
-      particleElsRef.current,
-      maxParticles
-    )
-
-    // Settling check: stop rAF loop when physical movement and particles are done
+    const activeCount = reducedMotion ? 0 : updateParticles(particlePoolRef.current, particleElsRef.current, maxParticles)
     const angleGap = Math.abs(((targetAngle - nextAngle + 540) % 360) - 180)
     const isSettled =
       Math.abs(targetP - currP) < 0.0003 &&
@@ -241,53 +251,56 @@ export default function ScrollRocket() {
     } else {
       scheduleFrame()
     }
-  }, [isLaunching, syncDockState, padAnchor])
+  }, [isLaunching, reducedMotion, syncDockState, padAnchor])
 
   const scheduleFrame = useCallback(() => {
     if (typeof document !== 'undefined' && document.hidden) return
-    if (rafIdRef.current === null) {
-      rafIdRef.current = requestAnimationFrame(tick)
-    }
+    if (rafIdRef.current === null) rafIdRef.current = requestAnimationFrame(tick)
   }, [tick])
 
-  // Passive scroll listener writing to refs
   useEffect(() => {
     lastScrollYRef.current = window.scrollY || window.pageYOffset || 0
     lastScrollTimeRef.current = performance.now()
 
     const onScroll = () => {
       const scrollY = window.scrollY || window.pageYOffset || 0
-      const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight || 0
-      const innerHeight = window.innerHeight || 0
+      const scrollH = document.documentElement.scrollHeight || document.body.scrollHeight || 0
+      const innerH = window.innerHeight || 0
 
-      // Direction detection
       const deltaY = scrollY - lastScrollYRef.current
-      if (Math.abs(deltaY) > 1) {
-        isScrollingUpRef.current = deltaY < 0
-      }
+      if (Math.abs(deltaY) > 1) isScrollingUpRef.current = deltaY < 0
 
-      // Velocity calculation
       const now = performance.now()
       const dt = Math.max(1, now - lastScrollTimeRef.current)
-      const rawSpeed = Math.abs(deltaY) / dt
-      velocityRef.current = smoothVelocity(velocityRef.current, rawSpeed * 16, 0.4)
-
+      velocityRef.current = smoothVelocity(velocityRef.current, (Math.abs(deltaY) / dt) * 16, 0.4)
       lastScrollYRef.current = scrollY
       lastScrollTimeRef.current = now
+      targetProgressRef.current = calculateScrollProgress(scrollY, scrollH, innerH)
 
-      targetProgressRef.current = calculateScrollProgress(scrollY, scrollHeight, innerHeight)
+      if (hudContainerRef.current) {
+        hudContainerRef.current.classList.remove('is-idle')
+        if (hudIdleTimerRef.current !== null) clearTimeout(hudIdleTimerRef.current)
+        hudIdleTimerRef.current = setTimeout(() => hudContainerRef.current?.classList.add('is-idle'), 1500)
+      }
 
       if (reducedMotion) {
-        // Under reduced motion: snap position instantly without loop or spring
-        currentProgressRef.current = targetProgressRef.current
-        const pt = computePathPoint(targetProgressRef.current, dimsRef.current)
-        const tangent = computePathTangent(targetProgressRef.current, dimsRef.current)
+        const p = targetProgressRef.current
+        currentProgressRef.current = p
+        const pt = computePathPoint(p, dimsRef.current)
+        const tangent = computePathTangent(p, dimsRef.current)
         const angle = computeRocketAngle(tangent.dx, tangent.dy, isScrollingUpRef.current)
         if (moverRef.current) {
-          moverRef.current.style.transform = `translate3d(${pt.x}px, ${pt.y}px, 0) rotate(${angle}deg)`
+          moverRef.current.style.transform = `translate3d(${pt.x.toFixed(1)}px, ${pt.y.toFixed(1)}px, 0) rotate(${angle}deg)`
         }
-        const landed = isLanded(targetProgressRef.current, LANDING_THRESHOLD)
-        syncDockState(landed, targetProgressRef.current > DOCK_VISIBLE_AT)
+        if (hudContainerRef.current) {
+          hudContainerRef.current.style.transform = `translate3d(${(pt.x - 18).toFixed(1)}px, ${pt.y.toFixed(1)}px, 0) translate(-100%, -50%)`
+          if (hudAltRef.current) hudAltRef.current.textContent = formatAltitude(p)
+          if (hudSectionRef.current)
+            hudSectionRef.current.textContent = getActiveSectionTitle(beaconsRef.current, p, 'ORBIT')
+        }
+        syncDockState(isLanded(p, LANDING_THRESHOLD), p > DOCK_VISIBLE_AT)
+        setIsDockedState(p <= DOCK_THRESHOLD)
+        setIsSeparatedState(computeSeparationState(p, isSeparatedRef.current))
       } else {
         scheduleFrame()
       }
@@ -295,9 +308,9 @@ export default function ScrollRocket() {
 
     window.addEventListener('scroll', onScroll, { passive: true })
     onScroll()
-
     return () => {
       window.removeEventListener('scroll', onScroll)
+      if (hudIdleTimerRef.current !== null) clearTimeout(hudIdleTimerRef.current)
       if (rafIdRef.current !== null) {
         cancelAnimationFrame(rafIdRef.current)
         rafIdRef.current = null
@@ -305,55 +318,40 @@ export default function ScrollRocket() {
     }
   }, [reducedMotion, scheduleFrame, syncDockState])
 
-  // Pause rAF loop when tab is hidden, resume when visible
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        if (rafIdRef.current !== null) {
-          cancelAnimationFrame(rafIdRef.current)
-          rafIdRef.current = null
-        }
-      } else {
+    const handleVis = () => {
+      if (document.hidden && rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current)
+        rafIdRef.current = null
+      } else if (!document.hidden) {
         scheduleFrame()
       }
     }
-
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+    document.addEventListener('visibilitychange', handleVis)
+    return () => document.removeEventListener('visibilitychange', handleVis)
   }, [scheduleFrame])
 
-  // Route transition handling: recompute on route navigation
   useEffect(() => {
+    updateBeacons()
     const scrollY = window.scrollY || window.pageYOffset || 0
-    const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight || 0
-    const innerHeight = window.innerHeight || 0
-    targetProgressRef.current = calculateScrollProgress(scrollY, scrollHeight, innerHeight)
+    const scrollH = document.documentElement.scrollHeight || document.body.scrollHeight || 0
+    targetProgressRef.current = calculateScrollProgress(scrollY, scrollH, window.innerHeight || 0)
     scheduleFrame()
-  }, [location.pathname, scheduleFrame])
+  }, [location.pathname, scheduleFrame, updateBeacons])
 
-  // 'Launch again' button handler
   const handleLaunchAgain = useCallback(() => {
     setIsLaunching(true)
     isScrollingUpRef.current = true
-    const reduced = prefersReducedMotion()
-
-    window.scrollTo({
-      top: 0,
-      behavior: reduced ? 'auto' : 'smooth',
-    })
-
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' })
     const timer = setTimeout(() => {
       setIsLaunching(false)
       isScrollingUpRef.current = false
     }, 900)
-
     return () => clearTimeout(timer)
   }, [])
 
   return (
-    // Not aria-hidden as a whole: the dock holds a real, focusable button. Each decorative child hides itself.
     <div ref={containerRef} className="rocket-overlay" style={{ width: dims.overlayWidth }}>
-      {/* Flight trajectory lines */}
       <svg
         className="rocket-track-svg"
         viewBox={`0 0 ${dims.overlayWidth} ${window.innerHeight || 800}`}
@@ -362,29 +360,33 @@ export default function ScrollRocket() {
       >
         <path d={pathD} className="rocket-track-bg" />
         <path ref={fgPathRef} d={pathD} className="rocket-track-fg" />
+        <WaypointBeacons
+          beacons={beacons}
+          dims={dims}
+          activeBeaconIdx={activeBeaconIdx}
+          ripplingIdx={ripplingIdx}
+        />
       </svg>
 
-      {/* Sparse exhaust particle pool */}
-      {!reducedMotion && (
-        <div className="rocket-particles" aria-hidden="true">
-          {Array.from({ length: MAX_PARTICLES_DESKTOP }).map((_, i) => (
-            <span
-              key={i}
-              ref={(el) => {
-                particleElsRef.current[i] = el
-              }}
-              className="rocket-particle"
-            />
-          ))}
-        </div>
-      )}
+      <OrbitalDock isDocked={isDockedState} x={dockPoint.x} y={dockPoint.y} />
 
-      {/* Rocket mover */}
+      {!reducedMotion && <ParticleTrail particleElsRef={particleElsRef} />}
+
+      <MissionHud
+        containerRef={hudContainerRef}
+        altRef={hudAltRef}
+        sectionRef={hudSectionRef}
+      />
+
       <div ref={moverRef} className="rocket-mover">
-        <RocketCraft isLanded={isLandedState} isLaunching={isLaunching} />
+        <RocketCraft
+          isLanded={isLandedState}
+          isLaunching={isLaunching}
+          isSeparated={isSeparatedState}
+          justSeparated={justSeparated}
+        />
       </div>
 
-      {/* Touchdown docking pad & Launch again button */}
       <LandingPad
         isLanded={isLandedState}
         isVisible={isDockVisible}
