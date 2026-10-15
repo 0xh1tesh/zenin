@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { CELESTIAL_BODIES, type CelestialBodyData } from './deepSky'
+import { CELESTIAL_BODIES, type CelestialBodyData } from './deepSkyMath'
 
 /**
  * Renders the ringed planet with a 3D layered front/back ring system.

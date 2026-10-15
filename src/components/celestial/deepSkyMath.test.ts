@@ -8,7 +8,7 @@ import {
   filterStarsForMobile,
   generateStars,
   mulberry32,
-} from './deepSky'
+} from './deepSkyMath'
 
 describe('deepSky logic and data helpers', () => {
   describe('mulberry32 PRNG', () => {

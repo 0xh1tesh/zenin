@@ -13,6 +13,7 @@ import './layout.css'
 
 const ScrollRocket = lazy(() => import('../rocket/ScrollRocket'))
 const CometSky = lazy(() => import('../ambient/CometSky'))
+const DeepSky = lazy(() => import('../celestial/DeepSky'))
 
 function PageFallback() {
   return (
@@ -51,7 +52,7 @@ export default function Layout() {
     return cancelWait
   }, [])
 
-  // Mount CometSky deferred after visitor interaction so it never affects LCP/TBT
+  // The background sky (constellations, bodies, comets) mounts after first interaction so it never affects LCP/TBT
   useEffect(() => {
     const cancelWait = afterFirstInteraction(() => setShowComets(true))
     return cancelWait
@@ -78,6 +79,7 @@ export default function Layout() {
       <BottomNav />
       {showComets && (
         <Suspense fallback={null}>
+          <DeepSky />
           <CometSky />
         </Suspense>
       )}

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { afterFirstInteraction, prefersReducedMotion } from '../../lib/motion'
-import { computeParallaxOffset } from './deepSky'
+import { computeParallaxOffset } from './deepSkyMath'
 import { DeepSkyBodies } from './DeepSkyBodies'
 import { DeepSkyConstellations } from './DeepSkyConstellations'
 import { DeepSkyStars } from './DeepSkyStars'

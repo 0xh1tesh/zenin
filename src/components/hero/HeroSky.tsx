@@ -7,7 +7,7 @@ import {
   generateBlinkingStars,
   type BlinkingStar,
   type ConstellationSpec,
-} from './heroSky.ts'
+} from './heroSkyMath'
 
 interface ConstellationRenderData {
   spec: ConstellationSpec

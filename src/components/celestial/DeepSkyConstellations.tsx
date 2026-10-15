@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { CONSTELLATIONS, type ConstellationData, type ConstellationStar } from './deepSky'
+import { CONSTELLATIONS, type ConstellationData, type ConstellationStar } from './deepSkyMath'
 
 /**
  * DeepSkyConstellations: Renders 8 real astronomical constellations

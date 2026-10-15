@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react'
-import { generateStars, type StarData } from './deepSky'
+import { generateStars, type StarData } from './deepSkyMath'
 
 interface DeepSkyStarsProps {
   seed?: number

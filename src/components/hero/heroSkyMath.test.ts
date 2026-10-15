@@ -5,7 +5,7 @@ import {
   computeConstellationPath,
   computeConstellationPathLength,
   generateBlinkingStars,
-} from './heroSky.ts'
+} from './heroSkyMath'
 
 describe('createPrng (Mulberry32)', () => {
   it('generates deterministic pseudorandom numbers in [0, 1)', () => {
@@ -148,7 +148,7 @@ describe('HeroSky component DOM structure', () => {
   it('renders all 5 constellations, celestial bodies, and aria-hidden=true', async () => {
     const { act, createElement } = await import('react')
     const { createRoot } = await import('react-dom/client')
-    const { default: HeroSky } = await import('./HeroSky.tsx')
+    const { default: HeroSky } = await import('./HeroSky')
 
     window.matchMedia =
       window.matchMedia ||

@@ -326,6 +326,29 @@
     top: 3.6rem;
     transform: scale(0.85);
   }
+
+  /* On phones the headline spans the full width, so the sky steps back behind it */
+  .hero-sky__constellations {
+    opacity: 0.45;
+  }
+
+  .hero-sky__pulsar {
+    display: none !important;
+  }
+
+  .hero-sky__gas-giant {
+    top: auto;
+    bottom: 46%;
+    left: 0.5rem;
+    transform: scale(0.7);
+  }
+
+  .hero-sky__crescent-moon {
+    top: auto;
+    bottom: 50%;
+    right: 0.5rem;
+    transform: scale(0.7);
+  }
 }
 
 /* ─── Reduced Motion ──────────────────────────────────────────────── */
