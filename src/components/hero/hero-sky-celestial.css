@@ -4,8 +4,9 @@
 /* ─── 3. Distant Ringed Gas Giant ─────────────────────────────────── */
 .hero-sky__gas-giant {
   position: absolute;
-  left: clamp(1rem, 6vw, 5rem);
-  top: clamp(3.5rem, 13vh, 8.5rem);
+  /* Open sky right of the title, clear of the constellations and the rocket track */
+  right: clamp(6rem, 13vw, 13rem);
+  top: clamp(18rem, 50vh, 30rem);
   pointer-events: none;
   will-change: transform;
 }
@@ -339,6 +340,7 @@
   .hero-sky__gas-giant {
     top: auto;
     bottom: 46%;
+    right: auto;
     left: 0.5rem;
     transform: scale(0.7);
   }

@@ -4,7 +4,7 @@
   top: 0;
   left: 0;
   pointer-events: none;
-  z-index: 30;
+  z-index: 1; /* below the craft (.rocket-mover) so it can never cover it */
   opacity: 1;
   transform-origin: right center;
   transition: opacity 350ms var(--ease);
@@ -18,8 +18,9 @@
   }
 }
 
-/* Fades out after 1.5s idle */
-.rocket-hud.is-idle {
+/* Fades out after 1.5s idle, and while the craft is docked or landed */
+.rocket-hud.is-idle,
+.rocket-hud.is-hidden {
   opacity: 0;
 }
 
@@ -56,7 +57,7 @@
 /* Line 1: Telemetry altitude readout */
 .rocket-hud__alt {
   color: var(--sand);
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }

@@ -178,7 +178,7 @@
 
 .hero__scroll-text {
   font-family: var(--font-mono);
-  font-size: 0.6rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.25em;
   text-transform: uppercase;
   color: var(--muted);

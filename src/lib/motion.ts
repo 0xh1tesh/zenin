@@ -1,15 +1,90 @@
 import { useSyncExternalStore } from 'react'
 
 const QUERY = '(prefers-reduced-motion: reduce)'
+const PAUSE_KEY = 'zenin-motion'
 
+/* ─── Visitor's own "pause animations" switch (WCAG 2.2.2), remembered per browser ─── */
+
+const pauseListeners = new Set<() => void>()
+
+function readStoredPause(): boolean {
+  try {
+    return typeof window !== 'undefined' && window.localStorage.getItem(PAUSE_KEY) === 'paused'
+  } catch {
+    return false
+  }
+}
+
+let userPaused = readStoredPause()
+
+const SWEEP_MS = 1000
+let sweepTimer: ReturnType<typeof setInterval> | undefined
+
+/**
+ * Pauses (or resumes) every endlessly looping CSS animation. One-shot entrance reveals are left alone,
+ * because freezing an element that starts hidden would leave it invisible.
+ */
+export function sweepLoopingAnimations(paused: boolean): void {
+  if (typeof document === 'undefined' || typeof document.getAnimations !== 'function') return
+  for (const animation of document.getAnimations()) {
+    if (animation.effect?.getTiming().iterations !== Infinity) continue
+    if (paused) animation.pause()
+    else if (animation.playState === 'paused') animation.play()
+  }
+}
+
+/** Applies the switch: <html data-motion="paused"> for styling hooks, plus the loop sweep. */
+export function applyMotionAttribute(): void {
+  if (typeof document === 'undefined') return
+  if (sweepTimer !== undefined) clearInterval(sweepTimer)
+  sweepTimer = undefined
+  if (userPaused) {
+    document.documentElement.dataset.motion = 'paused'
+    sweepLoopingAnimations(true)
+    // Layers mounted later (lazy sky, route changes) are caught by the next sweep.
+    sweepTimer = setInterval(() => sweepLoopingAnimations(true), SWEEP_MS)
+  } else {
+    delete document.documentElement.dataset.motion
+    sweepLoopingAnimations(false)
+  }
+}
+
+export function setMotionPaused(paused: boolean): void {
+  userPaused = paused
+  try {
+    if (paused) window.localStorage.setItem(PAUSE_KEY, 'paused')
+    else window.localStorage.removeItem(PAUSE_KEY)
+  } catch {
+    // Storage can be unavailable (private mode); the choice still applies for this visit.
+  }
+  applyMotionAttribute()
+  for (const listener of pauseListeners) listener()
+}
+
+function subscribePause(callback: () => void) {
+  pauseListeners.add(callback)
+  return () => {
+    pauseListeners.delete(callback)
+  }
+}
+
+export function useMotionPaused(): boolean {
+  return useSyncExternalStore(subscribePause, () => userPaused, () => false)
+}
+
+/** True when the OS asks for reduced motion or the visitor paused animations on this site. */
 export function prefersReducedMotion(): boolean {
-  return typeof window !== 'undefined' && window.matchMedia(QUERY).matches
+  return typeof window !== 'undefined' && (window.matchMedia(QUERY).matches || userPaused)
 }
 
 function subscribe(callback: () => void) {
   const mq = window.matchMedia(QUERY)
   mq.addEventListener('change', callback)
-  return () => mq.removeEventListener('change', callback)
+  const unsubscribePause = subscribePause(callback)
+  return () => {
+    mq.removeEventListener('change', callback)
+    unsubscribePause()
+  }
 }
 
 export function useReducedMotion(): boolean {

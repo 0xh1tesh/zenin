@@ -265,3 +265,67 @@
   font: 600 0.8125rem var(--font-body);
   text-align: center;
 }
+
+/* ─── Pause/play animations switch in the top bar ─────────────────────── */
+.motion-toggle {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-right: -0.75rem; /* sits closer to the call to action than the bar's 1.5rem gap */
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: rgb(16 16 16 / 0.55);
+  color: var(--sand);
+  transition:
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    background-color var(--dur) var(--ease);
+}
+
+.motion-toggle:hover {
+  border-color: var(--coral);
+  color: var(--coral);
+}
+
+.motion-toggle[aria-pressed='true'] {
+  border-color: var(--coral);
+  color: var(--coral);
+}
+
+.motion-toggle:focus-visible {
+  outline: 2px solid var(--coral);
+  outline-offset: 3px;
+}
+
+/* Phones: brand, pause switch and call to action share one line without wrapping */
+@media (max-width: 480px) {
+  .topbar {
+    gap: 0.75rem;
+  }
+
+  .topbar__cta {
+    padding-inline: 0.9rem;
+    white-space: nowrap;
+  }
+
+  .motion-toggle {
+    margin-right: 0;
+  }
+}
+
+.topbar__cta-short {
+  display: none;
+}
+
+/* The narrowest phones keep one tidy line by shortening the call to action */
+@media (max-width: 360px) {
+  .topbar__cta-long {
+    display: none;
+  }
+
+  .topbar__cta-short {
+    display: inline;
+  }
+}

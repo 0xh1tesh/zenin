@@ -1,6 +1,5 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
-import Sparkles from '../ambient/Sparkles'
 import { useInView } from '../ambient/useInView'
 import './layout.css'
 import './footer-fx.css'
@@ -11,7 +10,6 @@ export default function Footer() {
 
   return (
     <footer ref={footerRef} className="footer">
-      <Sparkles count={16} seed={333} className="footer-sparkles" />
 
       <div className="container footer__inner">
         <div className="footer__cols">

@@ -5,7 +5,6 @@ import Orbits from './Orbits'
 import Planet from './Planet'
 import Ridge from './Ridge'
 import StarField from './StarField'
-import ShootingStars from './ShootingStars'
 import HeroSky from './HeroSky'
 import { useHeroScroll } from './useHeroScroll'
 import './hero-scene.css'
@@ -60,7 +59,6 @@ export default function Hero({ stats }: { stats: HeroStats }) {
           <div className="hero__nebula-vermilion" />
         </div>
         <HeroSky />
-        <ShootingStars />
         <Planet />
         <Orbits />
         <div className="hero__title" aria-hidden="true">

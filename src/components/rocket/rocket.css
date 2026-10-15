@@ -51,6 +51,7 @@
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 3; /* above the readout (1) and the dock (2) */
   will-change: transform;
   pointer-events: none;
 }
@@ -139,7 +140,7 @@
   background: var(--void-3);
   border: 1px solid var(--line-strong);
   color: var(--sand);
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   user-select: none;
@@ -191,7 +192,7 @@
 @media (max-width: 639px) {
   .rocket-dock__btn {
     padding: 0.3rem 0.55rem;
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
   }
 }
 

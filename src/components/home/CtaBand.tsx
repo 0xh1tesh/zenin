@@ -2,7 +2,6 @@ import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import Caret from '../ambient/Caret'
 import Marquee from '../ambient/Marquee'
-import ShootingStars from '../ambient/ShootingStars'
 import { useInView } from '../ambient/useInView'
 import './home.css'
 
@@ -28,7 +27,6 @@ export default function CtaBand() {
 
       <div className="container">
         <div className="cta-band__card">
-          <ShootingStars count={2} />
           <div className="cta-band__glow" aria-hidden="true" />
           <div className="cta-band__grid-deco" aria-hidden="true" />
 

@@ -40,6 +40,8 @@ import { WaypointBeacons } from './WaypointBeacons'
 import './rocket.css'
 
 const DOCK_VISIBLE_AT = 0.93
+/** Clear space between the readout's right edge and the craft's centre line (craft + flame reach ~24px). */
+const HUD_GAP = 44
 const POS_EASE = 0.35
 const PAD_SURFACE_Y = 14
 
@@ -214,7 +216,9 @@ export default function ScrollRocket() {
     }
 
     if (hudContainerRef.current) {
-      hudContainerRef.current.style.transform = `translate3d(${(pt.x - 18).toFixed(1)}px, ${pt.y.toFixed(1)}px, 0) translate(-100%, -50%)`
+      // The readout only rides along in flight: docked at the station or landed on the pad it would crowd the craft.
+      hudContainerRef.current.classList.toggle('is-hidden', currP <= DOCK_THRESHOLD || landed)
+      hudContainerRef.current.style.transform = `translate3d(${(pt.x - HUD_GAP).toFixed(1)}px, ${pt.y.toFixed(1)}px, 0) translate(-100%, -50%)`
       if (hudAltRef.current) hudAltRef.current.textContent = formatAltitude(currP)
       if (hudSectionRef.current) hudSectionRef.current.textContent = getActiveSectionTitle(curBeacons, currP, 'ORBIT')
     }
@@ -293,7 +297,8 @@ export default function ScrollRocket() {
           moverRef.current.style.transform = `translate3d(${pt.x.toFixed(1)}px, ${pt.y.toFixed(1)}px, 0) rotate(${angle}deg)`
         }
         if (hudContainerRef.current) {
-          hudContainerRef.current.style.transform = `translate3d(${(pt.x - 18).toFixed(1)}px, ${pt.y.toFixed(1)}px, 0) translate(-100%, -50%)`
+          hudContainerRef.current.classList.toggle('is-hidden', p <= DOCK_THRESHOLD || isLanded(p, LANDING_THRESHOLD))
+          hudContainerRef.current.style.transform = `translate3d(${(pt.x - HUD_GAP).toFixed(1)}px, ${pt.y.toFixed(1)}px, 0) translate(-100%, -50%)`
           if (hudAltRef.current) hudAltRef.current.textContent = formatAltitude(p)
           if (hudSectionRef.current)
             hudSectionRef.current.textContent = getActiveSectionTitle(beaconsRef.current, p, 'ORBIT')

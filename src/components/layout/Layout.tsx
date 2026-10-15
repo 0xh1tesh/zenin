@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom'
-import { afterFirstInteraction } from '../../lib/motion'
+import { afterFirstInteraction, useMotionPaused } from '../../lib/motion'
 import { startSmoothScroll } from '../../lib/smoothScroll'
 import { EventGridSkeleton } from '../ui/Skeleton'
 import BottomNav from './BottomNav'
@@ -27,6 +27,8 @@ export default function Layout() {
   const { pathname } = useLocation()
   const [showRocket, setShowRocket] = useState(false)
   const [showComets, setShowComets] = useState(false)
+  // The sky canvases pick their still or live mode on mount, so a pause/play switch remounts them.
+  const motionPaused = useMotionPaused()
 
   // Inertial scrolling starts after first paint and only on desktop; see lib/smoothScroll.ts.
   useEffect(() => {
@@ -79,8 +81,8 @@ export default function Layout() {
       <BottomNav />
       {showComets && (
         <Suspense fallback={null}>
-          <DeepSky />
-          <CometSky />
+          <DeepSky key={motionPaused ? 'still' : 'live'} />
+          <CometSky key={motionPaused ? 'still' : 'live'} />
         </Suspense>
       )}
       {showRocket && (

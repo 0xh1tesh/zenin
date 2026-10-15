@@ -4,8 +4,6 @@ import type { EventSummary } from '../../types'
 import { computeBrowseCounts, type BrowseCounts } from './helpers'
 import { Skeleton } from '../ui/Skeleton'
 import Caret from '../ambient/Caret'
-import ShootingStars from '../ambient/ShootingStars'
-import Sparkles from '../ambient/Sparkles'
 import TileConstellation from '../ambient/TileConstellation'
 import { useInView } from '../ambient/useInView'
 import './home.css'
@@ -77,8 +75,6 @@ export default function BrowseTiles({ events }: BrowseTilesProps) {
       className="browse section"
       aria-label="Browse events by category and format"
     >
-      <ShootingStars count={3} />
-      <Sparkles count={16} seed={202} />
 
       <div className="container">
         <div className="browse__header">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { cx } from '../../lib/cx'
+import MotionToggle from './MotionToggle'
 import './layout.css'
 
 function BrandMark() {
@@ -43,8 +44,10 @@ export default function TopBar() {
           </Link>
         ))}
       </nav>
+      <MotionToggle />
       <Link to="/events" className="btn btn--primary topbar__cta">
-        Explore events
+        <span className="topbar__cta-long">Explore events</span>
+        <span className="topbar__cta-short">Events</span>
       </Link>
     </header>
   )

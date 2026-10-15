@@ -204,3 +204,30 @@ html.lenis body {
     opacity: 0;
   }
 }
+
+/* ─── Interaction and motion hygiene (ui-ux-pro-max audit) ─────────────── */
+
+/* Keyboard focus is never hidden under the fixed top bar or the phone bottom nav (WCAG 2.2 focus-not-obscured). */
+html {
+  scroll-padding-top: calc(var(--topbar-h) + 1rem);
+}
+
+@media (max-width: 1023px) {
+  html {
+    scroll-padding-bottom: calc(var(--bottomnav-h) + 1rem);
+  }
+}
+
+/* No double-tap zoom delay on controls; every control reads as clickable. */
+a,
+button,
+summary,
+label,
+[role='button'] {
+  touch-action: manipulation;
+}
+
+button:not(:disabled),
+summary {
+  cursor: pointer;
+}

@@ -8,6 +8,8 @@
   /* z-index: 1 sits above starfield canvas (0) and alongside nebula (1), behind planet (2) */
   z-index: 1;
   overflow: clip;
+  /* Fades out under the transparent top bar so no star or line ever sits behind the nav text */
+  mask-image: linear-gradient(to bottom, transparent 0, transparent calc(var(--topbar-h) - 0.5rem), #000 calc(var(--topbar-h) + 3rem));
 }
 
 /* Parallax depth sub-layers */
@@ -88,6 +90,8 @@
 .hero-sky__constellation-star-halo {
   fill: var(--coral);
   opacity: 0.15;
+  /* fill-box: scale each halo around its own star, not around the SVG's corner (which made halos drift off as blobs) */
+  transform-box: fill-box;
   transform-origin: center;
   animation: hero-sky-star-pulse 25s ease-in-out infinite;
   animation-delay: var(--delay, 0s);
@@ -139,8 +143,8 @@
     opacity: 0.15;
   }
   6%, 13% {
-    transform: scale(1.7);
-    opacity: 0.55;
+    transform: scale(1.4);
+    opacity: 0.35;
   }
   18% {
     transform: scale(1);

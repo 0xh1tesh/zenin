@@ -163,3 +163,32 @@ test.describe('scroll rocket', () => {
     await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 10_000 }).toBeLessThan(5)
   })
 })
+
+test.describe('pause animations', () => {
+  test('stops every looping animation, survives a reload, and never hides content', async ({ page }) => {
+    const runningLoops = () =>
+      page.evaluate(
+        () =>
+          document
+            .getAnimations()
+            .filter((a) => a.effect?.getTiming().iterations === Infinity && a.playState === 'running').length,
+      )
+
+    await page.goto('/')
+    const toggle = page.getByRole('button', { name: 'Pause animations' })
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false')
+    await toggle.click()
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true')
+    await expect.poll(runningLoops).toBe(0)
+
+    await page.reload()
+    await expect(page.getByRole('button', { name: 'Pause animations' })).toHaveAttribute('aria-pressed', 'true')
+    await expect.poll(runningLoops, { timeout: 5_000 }).toBe(0)
+    // Entrance reveals still finish: nothing that starts hidden stays hidden.
+    await expect(page.locator('.hero__ctas')).toHaveCSS('opacity', '1')
+    await expect(page.locator('.hero__tagline')).toHaveCSS('opacity', '1')
+
+    await page.getByRole('button', { name: 'Pause animations' }).click()
+    await expect.poll(runningLoops).toBeGreaterThan(0)
+  })
+})

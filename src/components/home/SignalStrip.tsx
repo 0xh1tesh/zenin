@@ -5,8 +5,6 @@ import { daysToNext } from './helpers'
 import { registrationState } from '../ui/StatusBadge'
 import { Skeleton } from '../ui/Skeleton'
 import Marquee from '../ambient/Marquee'
-import ShootingStars from '../ambient/ShootingStars'
-import Sparkles from '../ambient/Sparkles'
 import Caret from '../ambient/Caret'
 import { useInView } from '../ambient/useInView'
 import './home.css'
@@ -140,8 +138,6 @@ export default function SignalStrip({ events }: SignalStripProps) {
 
   return (
     <section ref={ref} className="signal section" aria-label="Programme statistics">
-      <ShootingStars count={2} />
-      <Sparkles count={14} seed={77} />
 
       {/* Marquee ticker bridging Hero and SignalStrip */}
       <div className="signal__top-marquee">
