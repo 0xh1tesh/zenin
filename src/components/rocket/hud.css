@@ -1,0 +1,87 @@
+/* ─── Mission HUD (Feature 3: Desktop >= 1024px only) ────────────────── */
+.rocket-hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 30;
+  opacity: 1;
+  transform-origin: right center;
+  transition: opacity 350ms var(--ease);
+  will-change: transform, opacity;
+}
+
+/* Hide on mobile & tablet (< 1024px) */
+@media (max-width: 1023px) {
+  .rocket-hud {
+    display: none !important;
+  }
+}
+
+/* Fades out after 1.5s idle */
+.rocket-hud.is-idle {
+  opacity: 0;
+}
+
+.rocket-hud__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  background: rgb(16 16 16 / 0.85);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.5);
+  user-select: none;
+}
+
+.rocket-hud__row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  line-height: 1;
+}
+
+.rocket-hud__led {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--coral);
+  box-shadow: 0 0 4px var(--coral);
+  flex-shrink: 0;
+}
+
+/* Line 1: Telemetry altitude readout */
+.rocket-hud__alt {
+  color: var(--sand);
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Line 2: Section name (max ~22ch with CSS truncation) */
+.rocket-hud__section {
+  color: var(--bone);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.15;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .rocket-hud {
+    transition: none !important;
+  }
+
+  .rocket-hud.is-idle {
+    opacity: 1 !important;
+  }
+}

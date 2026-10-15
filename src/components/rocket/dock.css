@@ -1,0 +1,140 @@
+/* ─── Orbital Docking Station (Feature 1) ─────────────────────────────── */
+.orbital-dock {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60px;
+  height: 40px;
+  margin-left: -30px;
+  margin-top: -8px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.orbital-dock__svg {
+  display: block;
+  overflow: visible;
+}
+
+/* Mechanical Docking Clamps */
+.dock-clamp {
+  transition: transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.orbital-dock.is-docked .dock-clamp--left {
+  transform: rotate(0deg);
+}
+
+.orbital-dock.is-docked .dock-clamp--right {
+  transform: rotate(0deg);
+}
+
+.orbital-dock.is-undocked .dock-clamp--left {
+  transform: rotate(-32deg);
+}
+
+.orbital-dock.is-undocked .dock-clamp--right {
+  transform: rotate(32deg);
+}
+
+/* Blinking Station Marker Lights */
+.dock-marker {
+  animation: dock-marker-blink 1.2s ease-in-out infinite alternate;
+}
+
+.dock-marker--right {
+  animation-delay: 600ms;
+}
+
+@keyframes dock-marker-blink {
+  0% {
+    opacity: 0.25;
+    filter: drop-shadow(0 0 1px transparent);
+  }
+  100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px var(--coral));
+  }
+}
+
+/* Cold-gas lateral thruster puffs on undock */
+.dock-gas-burst {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 16px;
+  pointer-events: none;
+}
+
+.dock-gas-dot {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--sand);
+  opacity: 0;
+}
+
+.dock-gas-dot--1 {
+  left: 14px;
+  top: 4px;
+  animation: dock-gas-burst-left 600ms ease-out forwards;
+}
+
+.dock-gas-dot--2 {
+  left: 10px;
+  top: 8px;
+  animation: dock-gas-burst-left 520ms ease-out 40ms forwards;
+}
+
+.dock-gas-dot--3 {
+  right: 14px;
+  top: 4px;
+  animation: dock-gas-burst-right 600ms ease-out forwards;
+}
+
+.dock-gas-dot--4 {
+  right: 10px;
+  top: 8px;
+  animation: dock-gas-burst-right 520ms ease-out 40ms forwards;
+}
+
+@keyframes dock-gas-burst-left {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-16px, 8px) scale(1.6);
+    opacity: 0;
+  }
+}
+
+@keyframes dock-gas-burst-right {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(16px, 8px) scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .dock-marker {
+    animation: none !important;
+    opacity: 0.8 !important;
+  }
+
+  .dock-clamp {
+    transition: none !important;
+  }
+
+  .dock-gas-burst {
+    display: none !important;
+  }
+}
