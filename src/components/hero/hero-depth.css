@@ -6,11 +6,20 @@
   --os: min(135vw, 66rem); /* orbit svg size */
 }
 
+/* Tablets also carry the bottom nav and have tall free space under the copy: a larger, higher planet fills it */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .hero__stage {
+    --pw: min(58vw, 28rem);
+    --pbottom: calc(var(--bottomnav-h) - 4%);
+    --os: min(150vw, 72rem);
+  }
+}
+
 @media (max-width: 640px) {
   .hero__stage {
     --pw: 88vw;
-    /* lift the planet clear of the fixed bottom navigation */
-    --pbottom: calc(var(--bottomnav-h) - 20%);
+    /* lift the planet clear of the fixed bottom navigation, high enough that the near half of the orbit (and its moons) shows */
+    --pbottom: calc(var(--bottomnav-h) - 6%);
     --os: 170vw;
   }
 }
