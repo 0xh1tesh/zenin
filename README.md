@@ -1,8 +1,8 @@
-# Zenith '26
+# Zenin '26
 
 The website of a fictional cosmic inter-college fest in Pune: thirty hackathons, workshops, performances and contests between 26 Sep and 15 Nov 2026. Built for the **Render72** design-and-build challenge.
 
-**Live:** https://zenith26.vercel.app · **Pages:** `/` landing · `/events` all events · `/events/:id` event detail
+**Live:** https://zenin26.vercel.app · **Pages:** `/` landing · `/events` all events · `/events/:id` event detail
 
 All content comes from the Render72 Events API (`GET /api/test/events`, `GET /api/test/events/{id}`).
 

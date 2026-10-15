@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router-dom'
 
-const SITE_NAME = "Zenith '26"
+const SITE_NAME = "Zenin '26"
 const SITE_URL: string =
   (import.meta.env.VITE_SITE_URL as string | undefined) ??
   (typeof window !== 'undefined' ? window.location.origin : '')
@@ -15,7 +15,7 @@ interface SeoProps {
 /** React 19 hoists <title>/<meta>/<link> rendered here into <head>. */
 export default function Seo({ title, description, image, noindex = false }: SeoProps) {
   const { pathname } = useLocation()
-  const fullTitle = title.includes('Zenith') ? title : `${title} · ${SITE_NAME}`
+  const fullTitle = title.includes('Zenin') ? title : `${title} · ${SITE_NAME}`
   const url = `${SITE_URL}${pathname}`
   const img = image ?? `${SITE_URL}/og.png`
 

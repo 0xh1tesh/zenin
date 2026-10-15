@@ -37,11 +37,11 @@ function fold(line: string): string {
 
 export function buildIcs(events: IcsEvent[]): string {
   const stamp = toIcsDate(new Date())
-  const lines: string[] = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Zenith 26//Events//EN', 'CALSCALE:GREGORIAN']
+  const lines: string[] = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Zenin 26//Events//EN', 'CALSCALE:GREGORIAN']
   for (const ev of events) {
     lines.push(
       'BEGIN:VEVENT',
-      `UID:${ev.uid}@zenith26`,
+      `UID:${ev.uid}@zenin26`,
       `DTSTAMP:${stamp}`,
       `DTSTART:${toIcsDate(ev.start)}`,
       `DTEND:${toIcsDate(ev.end)}`,

@@ -23,7 +23,7 @@ export default function Home() {
   return (
     <div className="page-bleed">
       <Seo
-        title="Zenith '26 — Pune's Inter-College Cosmic Fest"
+        title="Zenin '26 — Pune's Inter-College Cosmic Fest"
         description="Thirty hackathons, workshops, performances and competitions across two months. Explore Pune's flagship cosmic festival and register now."
       />
 

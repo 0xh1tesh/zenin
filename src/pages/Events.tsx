@@ -32,7 +32,7 @@ export default function Events() {
     <>
       <Seo
         title={title}
-        description="Browse every Zenith '26 event. Filter by technical or cultural, workshop or event, online or on campus, price and open registration."
+        description="Browse every Zenin '26 event. Filter by technical or cultural, workshop or event, online or on campus, price and open registration."
       />
       <div className="container events-page__header">
         <p className="eyebrow">The programme · 26 Sep – 15 Nov</p>

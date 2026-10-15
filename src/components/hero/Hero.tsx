@@ -48,7 +48,7 @@ export default function Hero({ stats }: { stats: HeroStats }) {
   useHeroScroll(trackRef)
 
   return (
-    <section className="hero" ref={trackRef} aria-label="Zenith '26 introduction">
+    <section className="hero" ref={trackRef} aria-label="Zenin '26 introduction">
       <div className="hero__stage">
         <StarField />
         <div className="hero__nebula" aria-hidden="true">
@@ -58,7 +58,7 @@ export default function Hero({ stats }: { stats: HeroStats }) {
         <Planet />
         <Orbits />
         <div className="hero__title" aria-hidden="true">
-          <span>ZENITH</span>
+          <span>ZENIN</span>
         </div>
         <Ridge />
         <div className="hero__fog" aria-hidden="true" />
@@ -66,13 +66,13 @@ export default function Hero({ stats }: { stats: HeroStats }) {
         <div className="hero__overlay">
           <p className="eyebrow hero__eyebrow">Pune · 26 Sep – 15 Nov 2026</p>
           <h1 className="hero__h1">
-            <span className="sr-only">Zenith &apos;26</span>
+            <span className="sr-only">Zenin &apos;26</span>
             <span className="hero__h1-visual" aria-hidden="true">
               <span className="hero__h1-word">
-                <Letters text="ZENITH" />
+                <Letters text="ZENIN" />
               </span>
               <span className="hero__h1-year">
-                <Letters text="'26" offset={6} accent />
+                <Letters text="'26" offset={5} accent />
               </span>
             </span>
           </h1>

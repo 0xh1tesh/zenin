@@ -76,7 +76,7 @@ export default function RegisterDialog({ event, isOpen, onClose }: RegisterDialo
         </div>
 
         <p className="detail-dialog__desc">
-          Registrations for Zenith &apos;26 events are processed directly by the organizing team and
+          Registrations for Zenin &apos;26 events are processed directly by the organizing team and
           event heads. Spots are confirmed in order of form submission.
         </p>
 

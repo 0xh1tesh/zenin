@@ -98,7 +98,7 @@ const mockDetail: EventDetail = {
 
 describe('buildEventJsonLd', () => {
   it('constructs schema.org Event metadata correctly', () => {
-    const jsonLd = buildEventJsonLd(mockDetail, 'https://zenith26.fest/events/ev-1')
+    const jsonLd = buildEventJsonLd(mockDetail, 'https://zenin26.fest/events/ev-1')
     expect(jsonLd['@context']).toBe('https://schema.org')
     expect(jsonLd['@type']).toBe('Event')
     expect(jsonLd.name).toBe('Cosmic Hackathon')
@@ -121,7 +121,7 @@ describe('buildEventJsonLd', () => {
       event_mode: 'ONLINE',
       registration_status: 'SOLD_OUT',
     }
-    const jsonLd = buildEventJsonLd(onlineDetail, 'https://zenith26.fest/events/ev-1')
+    const jsonLd = buildEventJsonLd(onlineDetail, 'https://zenin26.fest/events/ev-1')
     expect(jsonLd.eventAttendanceMode).toBe('https://schema.org/OnlineEventAttendanceMode')
     const location = jsonLd.location as Record<string, unknown>
     expect(location['@type']).toBe('VirtualLocation')

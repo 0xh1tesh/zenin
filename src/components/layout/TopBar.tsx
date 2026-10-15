@@ -31,9 +31,9 @@ export default function TopBar() {
 
   return (
     <header className={cx('topbar', solid && 'is-solid')}>
-      <Link to="/" className="topbar__brand" aria-label="Zenith '26, home">
+      <Link to="/" className="topbar__brand" aria-label="Zenin '26, home">
         <BrandMark />
-        <span className="topbar__name">ZENITH</span>
+        <span className="topbar__name">ZENIN</span>
         <span className="topbar__year">&apos;26</span>
       </Link>
       <nav className="topbar__nav" aria-label="Quick links">

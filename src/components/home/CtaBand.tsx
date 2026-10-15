@@ -3,7 +3,7 @@ import './home.css'
 
 export default function CtaBand() {
   return (
-    <section className="cta-band section" aria-label="Join Zenith '26">
+    <section className="cta-band section" aria-label="Join Zenin '26">
       <div className="container">
         <div className="cta-band__card">
           <div className="cta-band__glow" aria-hidden="true" />

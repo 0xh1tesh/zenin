@@ -7,7 +7,7 @@
 import { access, readFile, writeFile } from 'node:fs/promises'
 
 const BASE = 'https://render72.pages.dev/api/test'
-const SITE_URL = (process.env.SITE_URL ?? 'https://zenith26.vercel.app').replace(/\/$/, '')
+const SITE_URL = (process.env.SITE_URL ?? 'https://zenin26.vercel.app').replace(/\/$/, '')
 const SNAPSHOT = new URL('../public/events-snapshot.json', import.meta.url)
 const SITEMAP = new URL('../public/sitemap.xml', import.meta.url)
 const CONCURRENCY = 6

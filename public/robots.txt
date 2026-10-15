@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://zenith26.vercel.app/sitemap.xml
+Sitemap: https://zenin26.vercel.app/sitemap.xml

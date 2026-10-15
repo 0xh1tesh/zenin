@@ -4,7 +4,7 @@ import { expect, test } from '@playwright/test'
 test.describe('landing', () => {
   test('shows the hero and leads to the events page', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByRole('heading', { level: 1 })).toContainText(/zenith/i)
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(/zenin/i)
     await page.getByRole('link', { name: /explore events/i }).first().click()
     await expect(page).toHaveURL(/\/events$/)
   })

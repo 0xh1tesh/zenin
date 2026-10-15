@@ -19,7 +19,7 @@ export default function TicketPanel({ event, onOpenRegister }: TicketPanelProps)
 
   const handleCalendar = () => {
     const ics = eventToIcs(event, typeof window !== 'undefined' ? window.location.href : undefined)
-    downloadIcs(`${event.name}-zenith26.ics`, ics)
+    downloadIcs(`${event.name}-zenin26.ics`, ics)
   }
 
   const handleShare = async () => {
@@ -29,7 +29,7 @@ export default function TicketPanel({ event, onOpenRegister }: TicketPanelProps)
     if (typeof navigator !== 'undefined' && 'share' in navigator) {
       try {
         await navigator.share({
-          title: `${event.name} · Zenith '26`,
+          title: `${event.name} · Zenin '26`,
           text: event.blurb,
           url,
         })
