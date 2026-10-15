@@ -1,0 +1,229 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   CONSTELLATIONS — Hairline sand lines, SVG stroke-dashoffset draw,
+   brightening stars, and mono label transitions.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.deepsky-constellations-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.deepsky-constellation {
+  position: absolute;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.deepsky-constellation-svg {
+  display: block;
+  overflow: visible;
+}
+
+/* Hairline base lines: resting faint state */
+.deepsky-constellation-base-lines {
+  fill: none;
+  stroke: var(--sand);
+  stroke-width: 0.85px;
+  opacity: 0.22;
+  transition: opacity 0.5s ease;
+}
+
+/* Active lines: animated draw-in with stroke-dashoffset */
+.deepsky-constellation-active-lines {
+  fill: none;
+  stroke: var(--sand);
+  stroke-width: 1.1px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.15;
+  animation-name: deepsky-lines-cycle;
+  animation-iteration-count: infinite;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+
+/* Star cores & primary halos */
+.deepsky-constellation-star-core {
+  opacity: 0.5;
+  animation-name: deepsky-star-core-cycle;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+.deepsky-constellation-star-halo {
+  opacity: 0;
+  animation-name: deepsky-star-halo-cycle;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+/* Mono micro label */
+.deepsky-constellation-label {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sand);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(4px);
+  animation-name: deepsky-label-cycle;
+  animation-iteration-count: infinite;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+
+/* ─── Desktop 48s Cycle (8 constellations × 6s) ─────────────────────────── */
+@media (min-width: 640px) {
+  .deepsky-constellation-active-lines,
+  .deepsky-constellation-star-core,
+  .deepsky-constellation-star-halo,
+  .deepsky-constellation-label {
+    animation-duration: 48s;
+    animation-delay: calc(var(--c-desktop-index, 0) * 6s);
+  }
+}
+
+/* Keyframes for 48s cycle (active window is ~6s = 12.5% of timeline) */
+@keyframes deepsky-lines-cycle {
+  0% {
+    stroke-dashoffset: var(--line-len, 300);
+    opacity: 0.15;
+  }
+  1.5% {
+    stroke-dashoffset: 0;
+    opacity: 0.85;
+  }
+  7.5% {
+    stroke-dashoffset: 0;
+    opacity: 0.85;
+  }
+  11.5% {
+    stroke-dashoffset: 0;
+    opacity: 0.15;
+  }
+  12.5% {
+    stroke-dashoffset: var(--line-len, 300);
+    opacity: 0.15;
+  }
+  100% {
+    stroke-dashoffset: var(--line-len, 300);
+    opacity: 0.15;
+  }
+}
+
+@keyframes deepsky-star-core-cycle {
+  0% {
+    opacity: 0.45;
+    transform: scale(0.95);
+  }
+  2% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  7.5% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  11% {
+    opacity: 0.45;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 0.45;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes deepsky-star-halo-cycle {
+  0% {
+    opacity: 0;
+  }
+  2% {
+    opacity: 0.35;
+  }
+  7.5% {
+    opacity: 0.35;
+  }
+  10.5% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes deepsky-label-cycle {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  2% {
+    opacity: 0.95;
+    transform: translateY(0);
+  }
+  7.5% {
+    opacity: 0.95;
+    transform: translateY(0);
+  }
+  11% {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+/* ─── Mobile 18s Cycle (3 constellations × 6s) ──────────────────────────── */
+@media (max-width: 639.98px) {
+  .deepsky-constellation--desktop-only {
+    display: none !important;
+  }
+
+  .deepsky-constellation-active-lines,
+  .deepsky-constellation-star-core,
+  .deepsky-constellation-star-halo,
+  .deepsky-constellation-label {
+    animation-duration: 18s;
+    animation-delay: calc(var(--c-mobile-index, 0) * 6s);
+  }
+
+  .deepsky-constellation {
+    transform: scale(0.75);
+    transform-origin: top center;
+  }
+}
+
+/* ─── Reduced Motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .deepsky-constellation-active-lines,
+  .deepsky-constellation-star-core,
+  .deepsky-constellation-star-halo,
+  .deepsky-constellation-label {
+    animation: none !important;
+  }
+
+  .deepsky-constellation-active-lines {
+    stroke-dashoffset: 0 !important;
+    opacity: 0.22 !important;
+  }
+
+  .deepsky-constellation-star-core {
+    opacity: 0.5 !important;
+    transform: none !important;
+  }
+
+  .deepsky-constellation-star-halo {
+    opacity: 0 !important;
+  }
+
+  .deepsky-constellation-label {
+    opacity: 0 !important;
+  }
+}

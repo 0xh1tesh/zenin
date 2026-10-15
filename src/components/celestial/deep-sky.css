@@ -1,0 +1,246 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   DEEP SKY — Base fixed layer, cosmic gradient wash, stars, and parallax
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.deepsky-root {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  overflow: clip;
+  width: 100vw;
+  height: 100vh;
+  user-select: none;
+}
+
+/* ─── Parallax Container ─────────────────────────────────────────────────── */
+/* Translates slowly with scroll (~0.05x speed) for high cosmic depth */
+.deepsky-parallax {
+  position: absolute;
+  top: -5vh;
+  left: 0;
+  width: 100%;
+  height: 125vh;
+  transform: translateY(var(--deepsky-scroll-offset, 0px));
+  will-change: transform;
+}
+
+/* Native CSS scroll-driven animation where supported */
+@supports (animation-timeline: scroll(root)) {
+  .deepsky-parallax {
+    transform: none;
+    animation: deepsky-scroll-drift linear both;
+    animation-timeline: scroll(root);
+  }
+}
+
+@keyframes deepsky-scroll-drift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-160px);
+  }
+}
+
+/* ─── Deep-Sky Gradient Wash ─────────────────────────────────────────────── */
+/* Painted once as static CSS background: blue top-left, vermilion bottom-right,
+   and a diagonal Milky Way dust band. Never animated. */
+.deepsky-wash {
+  position: absolute;
+  inset: 0;
+  background-image:
+    /* Top-left blue nebula haze (~0.10 alpha) */
+    radial-gradient(circle 850px at 12% 10%, rgb(34 97 146 / 0.11), transparent 70%),
+    /* Mid-left secondary soft nebula */
+    radial-gradient(circle 600px at 4% 50%, rgb(34 97 146 / 0.06), transparent 65%),
+    /* Bottom-right vermilion cosmic glow (~0.06 alpha) */
+    radial-gradient(circle 950px at 88% 85%, rgb(213 54 12 / 0.06), transparent 75%),
+    /* Mid-right faint coral warmth */
+    radial-gradient(circle 550px at 92% 38%, rgb(239 133 87 / 0.04), transparent 60%),
+    /* Diagonal Milky Way band with soft dust lanes */
+    linear-gradient(
+      135deg,
+      transparent 0%,
+      rgb(230 213 189 / 0.015) 20%,
+      transparent 28%,
+      rgb(234 230 222 / 0.035) 44%,
+      /* Dust lane: dark rift in the stellar cloud */
+      rgb(16 16 16 / 0.045) 50%,
+      rgb(234 230 222 / 0.03) 56%,
+      transparent 70%,
+      rgb(34 97 146 / 0.025) 86%,
+      transparent 100%
+    );
+  pointer-events: none;
+}
+
+/* ─── Background Field Stars ─────────────────────────────────────────────── */
+.deepsky-stars-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.deepsky-star {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+/* 1. Slow Twinkle: soft breathing sine wave */
+.deepsky-star--twinkle-slow {
+  animation-name: deepsky-twinkle-slow;
+  animation-delay: var(--star-delay, 0s);
+  animation-duration: var(--star-dur, 4s);
+}
+
+@keyframes deepsky-twinkle-slow {
+  0%, 100% {
+    opacity: 0.22;
+    transform: translate(-50%, -50%) scale(0.85);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+}
+
+/* 2. Fast Twinkle: gentle shimmer */
+.deepsky-star--twinkle-fast {
+  animation-name: deepsky-twinkle-fast;
+  animation-delay: var(--star-delay, 0s);
+  animation-duration: var(--star-dur, 2.2s);
+}
+
+@keyframes deepsky-twinkle-fast {
+  0%, 100% {
+    opacity: 0.28;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  48%, 52% {
+    opacity: 0.95;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+/* 3. Double-Blink: staccato pulse */
+.deepsky-star--double-blink {
+  animation-name: deepsky-double-blink;
+  animation-delay: var(--star-delay, 0s);
+  animation-duration: var(--star-dur, 5s);
+}
+
+@keyframes deepsky-double-blink {
+  0%, 16%, 36%, 100% {
+    opacity: 0.18;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  6%, 10% {
+    opacity: 0.95;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  22%, 28% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+}
+
+/* 4. Color-Shift: subtle shift between bone, coral, and blue */
+.deepsky-star--color-shift {
+  animation-name: deepsky-color-shift;
+  animation-delay: var(--star-delay, 0s);
+  animation-duration: var(--star-dur, 6s);
+}
+
+@keyframes deepsky-color-shift {
+  0%, 100% {
+    background-color: var(--bone);
+    opacity: 0.3;
+  }
+  33% {
+    background-color: var(--coral);
+    opacity: 0.85;
+  }
+  66% {
+    background-color: var(--blue);
+    opacity: 0.8;
+  }
+}
+
+/* 5. Glint: 4-point diffraction spike flare */
+.deepsky-star--glint {
+  animation-name: deepsky-glint;
+  animation-delay: var(--star-delay, 0s);
+  animation-duration: var(--star-dur, 7s);
+}
+
+.deepsky-star--glint::before,
+.deepsky-star--glint::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background-color: currentColor;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.deepsky-star--glint::before {
+  width: 12px;
+  height: 1px;
+  opacity: 0.7;
+}
+
+.deepsky-star--glint::after {
+  width: 1px;
+  height: 12px;
+  opacity: 0.7;
+}
+
+@keyframes deepsky-glint {
+  0%, 100% {
+    opacity: 0.25;
+    transform: translate(-50%, -50%) scale(0.7) rotate(0deg);
+  }
+  46% {
+    opacity: 0.35;
+    transform: translate(-50%, -50%) scale(0.85) rotate(15deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.35) rotate(45deg);
+  }
+  54% {
+    opacity: 0.35;
+    transform: translate(-50%, -50%) scale(0.85) rotate(75deg);
+  }
+}
+
+/* ─── Mobile Visibility ──────────────────────────────────────────────────── */
+@media (max-width: 639.98px) {
+  .deepsky-star--desktop-only {
+    display: none !important;
+  }
+}
+
+/* ─── Reduced Motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .deepsky-parallax {
+    transform: none !important;
+    animation: none !important;
+  }
+  .deepsky-star {
+    animation: none !important;
+    opacity: 0.45 !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  .deepsky-star--glint::before,
+  .deepsky-star--glint::after {
+    opacity: 0.4 !important;
+  }
+}

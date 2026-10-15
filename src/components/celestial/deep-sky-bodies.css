@@ -1,0 +1,166 @@
+/* ══════════════════════════════════════════════════════════════════════════════
+   CELESTIAL BODIES — Planets, cratered moon, ice planet, spiral galaxy,
+   pulsars, binary star, and drifting asteroids.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+.deepsky-bodies-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.deepsky-body {
+  position: absolute;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Spiral Galaxy Rotation ─────────────────────────────────────────────── */
+.deepsky-galaxy-container {
+  width: 100%;
+  height: 100%;
+  animation: deepsky-galaxy-spin 160s linear infinite;
+  transform-origin: center center;
+}
+
+.deepsky-galaxy-svg {
+  overflow: visible;
+}
+
+@keyframes deepsky-galaxy-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Pulsar Expanding Wave Rings ────────────────────────────────────────── */
+.deepsky-pulsar-ring {
+  fill: none;
+  stroke-width: 0.85px;
+  transform-origin: 30px 30px;
+  animation: deepsky-pulsar-pulse 3.8s ease-out infinite;
+}
+
+.deepsky-pulsar-ring--1 {
+  animation-delay: 0s;
+}
+
+.deepsky-pulsar-ring--2 {
+  animation-delay: 1.25s;
+}
+
+.deepsky-pulsar-ring--3 {
+  animation-delay: 2.5s;
+}
+
+@keyframes deepsky-pulsar-pulse {
+  0% {
+    transform: scale(0.3);
+    opacity: 0.7;
+  }
+  75% {
+    opacity: 0.2;
+  }
+  100% {
+    transform: scale(3.5);
+    opacity: 0;
+  }
+}
+
+/* ─── Binary Star Orbit ──────────────────────────────────────────────────── */
+.deepsky-binary-system {
+  width: 100%;
+  height: 100%;
+  animation: deepsky-binary-orbit 24s linear infinite;
+  transform-origin: 25px 25px;
+}
+
+@keyframes deepsky-binary-orbit {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Drifting Asteroids ─────────────────────────────────────────────────── */
+.deepsky-asteroid--a {
+  animation: deepsky-asteroid-drift-a 32s ease-in-out infinite alternate;
+}
+
+.deepsky-asteroid--b {
+  animation: deepsky-asteroid-drift-b 26s ease-in-out infinite alternate;
+}
+
+@keyframes deepsky-asteroid-drift-a {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(6px, -8px) rotate(18deg);
+  }
+  100% {
+    transform: translate(-4px, -14px) rotate(35deg);
+  }
+}
+
+@keyframes deepsky-asteroid-drift-b {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-5px, 6px) rotate(-16deg);
+  }
+  100% {
+    transform: translate(3px, 12px) rotate(-32deg);
+  }
+}
+
+/* ─── Mobile Visibility & Scaling ────────────────────────────────────────── */
+@media (max-width: 639.98px) {
+  .deepsky-body--desktop-only {
+    display: none !important;
+  }
+
+  .deepsky-body--ringed-planet {
+    transform: scale(0.72);
+    transform-origin: left top;
+  }
+
+  .deepsky-body--cratered-moon {
+    transform: scale(0.8);
+    transform-origin: right center;
+  }
+
+  .deepsky-body--ice-planet {
+    transform: scale(0.75);
+    transform-origin: left bottom;
+  }
+}
+
+/* ─── Reduced Motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .deepsky-galaxy-container,
+  .deepsky-pulsar-ring,
+  .deepsky-binary-system,
+  .deepsky-asteroid--a,
+  .deepsky-asteroid--b {
+    animation: none !important;
+  }
+
+  .deepsky-pulsar-ring {
+    opacity: 0.25 !important;
+    transform: scale(1.6) !important;
+  }
+
+  .deepsky-asteroid--a,
+  .deepsky-asteroid--b {
+    transform: none !important;
+  }
+}
