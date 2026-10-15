@@ -1,0 +1,3 @@
+/* ─── Hero Sky master stylesheet (split for modularity & file-length limits) ─── */
+@import './hero-sky-constellations.css';
+@import './hero-sky-celestial.css';
