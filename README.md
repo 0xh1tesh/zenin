@@ -1,6 +1,6 @@
 # Zenin '26
 
-The website of a fictional cosmic inter-college fest in Pune: thirty hackathons, workshops, performances and contests between 26 Sep and 15 Nov 2026. Built for the **Render72** design-and-build challenge.
+The website of a fictional cosmic inter-college fest in Coimbatore: thirty hackathons, workshops, performances and contests between 26 Sep and 15 Nov 2026. Built for the **Render72** design-and-build challenge.
 
 **Live:** https://zenin26.vercel.app · **Pages:** `/` landing · `/events` all events · `/events/:id` event detail
 

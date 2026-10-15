@@ -66,8 +66,8 @@ export function computePathDimensions(
       trackHeight,
       topOffset,
       bottomOffset,
-      amplitude: 10,
-      centerOffset: 22,
+      amplitude: 6,
+      centerOffset: 18,
       waves: 2.0,
     }
   }
@@ -81,8 +81,10 @@ export function computePathDimensions(
     trackHeight,
     topOffset,
     bottomOffset,
-    amplitude: Math.min(26, overlayWidth * 0.26),
-    centerOffset: overlayWidth / 2,
+    // Kept well inside the strip: a tilted craft plus its flame reaches ~24px either side of the track,
+    // and the strip's right edge is the viewport edge right next to the scrollbar.
+    amplitude: Math.min(18, overlayWidth * 0.18),
+    centerOffset: overlayWidth * 0.42,
     waves: 2.0,
   }
 }

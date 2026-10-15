@@ -67,7 +67,7 @@ export default function Hero({ stats }: { stats: HeroStats }) {
         <div className="hero__fog" aria-hidden="true" />
 
         <div className="hero__overlay">
-          <p className="eyebrow hero__eyebrow">Pune · 26 Sep – 15 Nov 2026</p>
+          <p className="eyebrow hero__eyebrow">Coimbatore · 26 Sep – 15 Nov 2026</p>
           <h1 className="hero__h1">
             <span className="sr-only">Zenin &apos;26</span>
             <span className="hero__h1-visual" aria-hidden="true">

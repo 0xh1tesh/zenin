@@ -47,7 +47,7 @@ describe('computePathDimensions', () => {
     const dims = computePathDimensions(375, 667, true)
     expect(dims.overlayWidth).toBeLessThanOrEqual(44)
     expect(dims.overlayWidth).toBe(44)
-    expect(dims.centerOffset).toBe(22)
+    expect(dims.centerOffset).toBe(18)
     expect(dims.amplitude).toBeLessThanOrEqual(12)
     // Must clear bottom nav and topbar
     expect(dims.topOffset).toBeGreaterThanOrEqual(68)

@@ -8,7 +8,7 @@ import './home.css'
 
 const CTA_TICKER_ITEMS = [
   'REGISTRATIONS OPEN',
-  'PUNE COSMIC ARENA',
+  'COIMBATORE COSMIC ARENA',
   '30 EVENTS ACROSS 2 MONTHS',
   'SECURE YOUR TEAM ORBIT',
   'ALL TRANSMISSIONS VERIFIED',
@@ -61,7 +61,7 @@ export default function CtaBand() {
             <h2 className="cta-band__title">Find your orbit</h2>
             <p className="cta-band__tagline">
               Thirty competitions, hackathons, and showcases across engineering, arts, and performance.
-              Secure your team&apos;s place in Pune&apos;s flagship inter-college festival.
+              Secure your team&apos;s place in Coimbatore&apos;s flagship inter-college festival.
             </p>
 
             <div className="cta-band__actions">
@@ -77,7 +77,7 @@ export default function CtaBand() {
             </div>
 
             <div className="cta-band__telemetry mono">
-              <span>PUNE · 18.5204° N, 73.8567° E</span>
+              <span>COIMBATORE · 11.0168° N, 76.9558° E</span>
               <span className="cta-band__dot" aria-hidden="true">
                 ·
               </span>

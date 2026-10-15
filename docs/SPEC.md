@@ -1,7 +1,7 @@
 # Zenin '26 — build spec (read fully before writing code)
 
 ## 1. What we are building
-**Zenin '26** is the website of a fictional cosmic inter-college fest in Pune: 30 events (hackathons, coding contests, robotics/AI workshops, dance, theatre, photography, music, quizzes, food) between 26 Sep and 15 Nov 2026. All content comes from a live API. It is a submission to the **Render72** design-and-build challenge. Required pages: a landing page plus an events page. We ship `/`, `/events`, `/events/:id`, and a 404.
+**Zenin '26** is the website of a fictional cosmic inter-college fest in Coimbatore: 30 events (hackathons, coding contests, robotics/AI workshops, dance, theatre, photography, music, quizzes, food) between 26 Sep and 15 Nov 2026. All content comes from a live API. It is a submission to the **Render72** design-and-build challenge. Required pages: a landing page plus an events page. We ship `/`, `/events`, `/events/:id`, and a 404.
 
 **Judging (from the portal, in priority order):**
 - MEASURED: Performance (Lighthouse score + real load: FCP, LCP, CLS), Responsiveness (375, 768, 1280 wide, no horizontal scroll), Backend error handling (500s, timeouts, empty data), Scalability readiness (caching, lazy loading/pagination, optimized assets).

@@ -23,8 +23,8 @@ export default function Home() {
   return (
     <div className="page-bleed">
       <Seo
-        title="Zenin '26 — Pune's Inter-College Cosmic Fest"
-        description="Thirty hackathons, workshops, performances and competitions across two months. Explore Pune's flagship cosmic festival and register now."
+        title="Zenin '26 — Coimbatore's Inter-College Cosmic Fest"
+        description="Thirty hackathons, workshops, performances and competitions across two months. Explore Coimbatore's flagship cosmic festival and register now."
       />
 
       <Hero stats={heroStats} />

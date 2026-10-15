@@ -100,7 +100,7 @@ export default function RegisterDialog({ event, isOpen, onClose }: RegisterDialo
           <div className="detail-dialog__meta-item">
             <span className="detail-dialog__meta-label">Event Mode</span>
             <span className="detail-dialog__meta-val">
-              {event.event_mode === 'ONLINE' ? 'Online' : 'Campus (Pune)'}
+              {event.event_mode === 'ONLINE' ? 'Online' : 'Campus (Coimbatore)'}
             </span>
           </div>
         </div>

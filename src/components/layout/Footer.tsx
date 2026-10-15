@@ -16,7 +16,7 @@ export default function Footer() {
       <div className="container footer__inner">
         <div className="footer__cols">
           <div>
-            <p className="eyebrow">Zenin &apos;26 · Pune</p>
+            <p className="eyebrow">Zenin &apos;26 · Coimbatore</p>
             <p className="footer__blurb">
               Two months, thirty events, one sky. Hackathons, robotics, AI, dance, theatre and everything in between.
             </p>

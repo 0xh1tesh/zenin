@@ -31,7 +31,7 @@ export function buildEventJsonLd(event: EventDetail, currentUrl?: string): Recor
   const endDate = istDate(end_date, end_time).toISOString()
   const isOnline = event.event_mode === 'ONLINE'
   const isRegistrable = event.registration_status === 'OPEN' && event.event_status === 'ACTIVE'
-  const venue = event.schedules[0]?.venue || 'Pune Campus'
+  const venue = event.schedules[0]?.venue || 'Coimbatore Campus'
 
   return {
     '@context': 'https://schema.org',
@@ -58,7 +58,7 @@ export function buildEventJsonLd(event: EventDetail, currentUrl?: string): Recor
           name: venue,
           address: {
             '@type': 'PostalAddress',
-            addressLocality: 'Pune',
+            addressLocality: 'Coimbatore',
             addressCountry: 'IN',
           },
         },

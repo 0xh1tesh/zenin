@@ -33,7 +33,7 @@ export default function DetailHero({ event }: DetailHeroProps) {
       ? event.schedules[0].venue
       : event.event_mode === 'ONLINE'
         ? 'Online'
-        : 'Pune Campus'
+        : 'Coimbatore Campus'
 
   const handleBack = (e: MouseEvent<HTMLAnchorElement>) => {
     if (typeof window !== 'undefined' && window.history.state && window.history.state.idx > 0) {
