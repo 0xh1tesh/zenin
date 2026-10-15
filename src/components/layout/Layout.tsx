@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom'
-import { afterFirstInteraction, useMotionPaused } from '../../lib/motion'
+import { afterFirstInteraction, useMotionPaused, usePhoneLayout } from '../../lib/motion'
 import { startSmoothScroll } from '../../lib/smoothScroll'
 import { useCursorSky } from '../ambient/useCursorSky'
 import { EventGridSkeleton } from '../ui/Skeleton'
@@ -30,6 +30,8 @@ export default function Layout() {
   const [showComets, setShowComets] = useState(false)
   // The sky canvases pick their still or live mode on mount, so a pause/play switch remounts them.
   const motionPaused = useMotionPaused()
+  // The comet canvas redraws the whole screen ~30 times a second; phones keep the still deep sky only.
+  const isPhone = usePhoneLayout()
   // Stars, constellations and planets react to a nearby cursor; costs nothing until the pointer moves.
   useCursorSky(true)
 
@@ -85,7 +87,7 @@ export default function Layout() {
       {showComets && (
         <Suspense fallback={null}>
           <DeepSky key={motionPaused ? 'still' : 'live'} />
-          <CometSky key={motionPaused ? 'still' : 'live'} />
+          {!isPhone && <CometSky key={motionPaused ? 'still' : 'live'} />}
         </Suspense>
       )}
       {showRocket && (

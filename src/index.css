@@ -231,3 +231,22 @@ button:not(:disabled),
 summary {
   cursor: pointer;
 }
+
+/* ─── Phones: a calm, still sky so scrolling stays smooth (tablets and desktop keep every animation) ─── */
+@media (max-width: 767px) {
+  .deepsky-root,
+  .deepsky-root *,
+  .hero-sky * {
+    animation: none !important;
+  }
+
+  .rocket-particles,
+  .rocket-speed-lines,
+  .rocket-reentry-glow {
+    display: none !important;
+  }
+
+  .rocket-track-fg {
+    filter: none;
+  }
+}

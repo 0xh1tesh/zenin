@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { prefersReducedMotion, useReducedMotion } from '../../lib/motion'
+import { prefersReducedMotion, useReducedMotion, PHONE_QUERY } from '../../lib/motion'
 import {
   calculateScrollProgress,
   computeFlameScale,
@@ -112,10 +112,14 @@ export default function ScrollRocket() {
   const pathD = useMemo(() => generateSvgPathString(dims, 60), [dims])
   const dockPoint = useMemo(() => computePathPoint(0, dims), [dims])
 
+  // The trail's length only changes with the path, so it is measured here once, not on every frame.
+  const trailLengthRef = useRef(0)
+
   useLayoutEffect(() => {
     if (fgPathRef.current) {
       try {
         const total = fgPathRef.current.getTotalLength()
+        trailLengthRef.current = total
         fgPathRef.current.style.strokeDasharray = `${total} ${total}`
         fgPathRef.current.style.strokeDashoffset = `${total * (1 - currentProgressRef.current)}`
       } catch {
@@ -223,23 +227,20 @@ export default function ScrollRocket() {
       if (hudSectionRef.current) hudSectionRef.current.textContent = getActiveSectionTitle(curBeacons, currP, 'ORBIT')
     }
 
-    if (fgPathRef.current) {
-      try {
-        const total = fgPathRef.current.getTotalLength()
-        fgPathRef.current.style.strokeDashoffset = `${(total * (1 - currP)).toFixed(1)}`
-      } catch {
-        /* Fallback */
-      }
+    if (fgPathRef.current && trailLengthRef.current > 0) {
+      fgPathRef.current.style.strokeDashoffset = `${(trailLengthRef.current * (1 - currP)).toFixed(1)}`
     }
 
     const isMobile = window.innerWidth < 640
     const maxParticles = isMobile ? MAX_PARTICLES_MOBILE : MAX_PARTICLES_DESKTOP
+    // Phones skip the exhaust particles entirely: scroll smoothness comes first there.
+    const isPhone = window.matchMedia(PHONE_QUERY).matches
 
-    if (!reducedMotion && shouldEmitParticle(vel, landed, isMobile, 0, maxParticles)) {
+    if (!reducedMotion && !isPhone && shouldEmitParticle(vel, landed, isMobile, 0, maxParticles)) {
       emitParticle(particlePoolRef.current, maxParticles, pt.x, pt.y, nextAngle, isScrollingUpRef.current, isMobile)
     }
 
-    const activeCount = reducedMotion ? 0 : updateParticles(particlePoolRef.current, particleElsRef.current, maxParticles)
+    const activeCount = reducedMotion || isPhone ? 0 : updateParticles(particlePoolRef.current, particleElsRef.current, maxParticles)
     const angleGap = Math.abs(((targetAngle - nextAngle + 540) % 360) - 180)
     const isSettled =
       Math.abs(targetP - currP) < 0.0003 &&

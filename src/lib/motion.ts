@@ -1,6 +1,19 @@
 import { useSyncExternalStore } from 'react'
 
 const QUERY = '(prefers-reduced-motion: reduce)'
+
+/** Phones get a calmer version of the ambient sky so scrolling stays smooth; tablets and desktop get it all. */
+export const PHONE_QUERY = '(max-width: 767px)'
+
+function subscribePhone(callback: () => void) {
+  const mq = window.matchMedia(PHONE_QUERY)
+  mq.addEventListener('change', callback)
+  return () => mq.removeEventListener('change', callback)
+}
+
+export function usePhoneLayout(): boolean {
+  return useSyncExternalStore(subscribePhone, () => window.matchMedia(PHONE_QUERY).matches, () => false)
+}
 const PAUSE_KEY = 'zenin-motion'
 
 /* ─── Visitor's own "pause animations" switch (WCAG 2.2.2), remembered per browser ─── */
