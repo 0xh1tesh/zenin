@@ -139,3 +139,6 @@ export function groupEventsByMonth(events: EventSummary[] | null): MonthGroup[] 
 
   return groups
 }
+
+export { isWithinHours } from '../ambient/ambientHelpers'
+

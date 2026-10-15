@@ -1,9 +1,12 @@
+import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import type { EventSummary } from '../../types'
 import { formatDate, formatWeekday } from '../../lib/format'
 import { registrationState } from '../ui/StatusBadge'
 import { groupEventsByMonth } from './helpers'
 import { Skeleton } from '../ui/Skeleton'
+import Caret from '../ambient/Caret'
+import { useInView } from '../ambient/useInView'
 import './home.css'
 
 export interface ProgrammeProps {
@@ -13,14 +16,23 @@ export interface ProgrammeProps {
 const MONTH_SKELETONS = ['September 2026', 'October 2026', 'November 2026']
 
 export default function Programme({ events }: ProgrammeProps) {
+  const sectionRef = useRef<HTMLElement>(null)
+  useInView(sectionRef)
   const monthGroups = groupEventsByMonth(events)
 
   return (
-    <section className="programme section" aria-label="Chronological programme schedule">
+    <section
+      ref={sectionRef}
+      className="programme section"
+      aria-label="Chronological programme schedule"
+    >
       <div className="container">
         <div className="programme__header">
           <div>
-            <p className="eyebrow programme__eyebrow">05 — The programme</p>
+            <p className="eyebrow programme__eyebrow">
+              <span>05 — The programme</span>
+              <Caret />
+            </p>
             <h2 className="programme__heading">Timeline flight plan</h2>
           </div>
           <div className="programme__legend" aria-hidden="true">
@@ -44,7 +56,9 @@ export default function Programme({ events }: ProgrammeProps) {
             {MONTH_SKELETONS.map((month) => (
               <div key={month} className="programme__month">
                 <div className="programme__month-head">
-                  <span className="programme__month-title mono">{month}</span>
+                  <div className="programme__month-title-wrap">
+                    <span className="programme__month-title mono">{month}</span>
+                  </div>
                 </div>
                 <div className="programme__month-list">
                   {Array.from({ length: 4 }, (_, i) => (
@@ -67,13 +81,25 @@ export default function Programme({ events }: ProgrammeProps) {
             {monthGroups.map((group) => (
               <div key={group.key} className="programme__month">
                 <div className="programme__month-head">
-                  <h3 className="programme__month-title mono">{group.label}</h3>
+                  <div className="programme__month-title-wrap">
+                    {/* Orbiting celestial dot */}
+                    <div className="programme__orbit" aria-hidden="true">
+                      <span className="programme__orbit-ring" />
+                      <span className="programme__orbit-dot" />
+                    </div>
+                    <h3 className="programme__month-title mono">{group.label}</h3>
+                  </div>
                   <span className="programme__month-count mono">
                     {group.events.length} {group.events.length === 1 ? 'entry' : 'entries'}
                   </span>
                 </div>
 
                 <div className="programme__month-list" role="list">
+                  {/* Timeline spine with travelling light pulse */}
+                  <div className="programme__month-spine" aria-hidden="true">
+                    <div className="programme__spine-pulse" />
+                  </div>
+
                   {group.events.map((event) => {
                     const state = registrationState(event)
                     const archived = event.event_status !== 'ACTIVE' || state.tone === 'archive'

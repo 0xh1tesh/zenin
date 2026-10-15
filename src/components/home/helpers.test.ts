@@ -8,6 +8,7 @@ import {
   eventStartDate,
   getClosingSoonEvents,
   groupEventsByMonth,
+  isWithinHours,
   startsInFuture,
 } from './helpers'
 
@@ -259,3 +260,20 @@ describe('groupEventsByMonth', () => {
     expect(groups[2].events[0].id).toBe('nov')
   })
 })
+
+describe('isWithinHours (via home/helpers)', () => {
+  const NOW = new Date('2026-10-15T12:00:00Z').getTime()
+
+  it('identifies deadlines within 72 hours', () => {
+    const inside = new Date(NOW + 24 * 3600 * 1000).toISOString()
+    expect(isWithinHours(inside, 72, NOW)).toBe(true)
+  })
+
+  it('rejects deadlines beyond 72 hours or in the past', () => {
+    const past = new Date(NOW - 1000).toISOString()
+    const future = new Date(NOW + 80 * 3600 * 1000).toISOString()
+    expect(isWithinHours(past, 72, NOW)).toBe(false)
+    expect(isWithinHours(future, 72, NOW)).toBe(false)
+  })
+})
+

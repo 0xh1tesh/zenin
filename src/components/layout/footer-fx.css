@@ -1,0 +1,119 @@
+/* ─── Footer Ambient Visual Effects ────────────────────────────────────── */
+
+.footer {
+  position: relative;
+  overflow: clip;
+}
+
+/* Twinkling starfield dust layer */
+.footer-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Shimmering giant display wordmark */
+.footer__wordmark {
+  position: relative;
+  background: linear-gradient(
+    95deg,
+    rgb(230 213 189 / 0.1) 0%,
+    rgb(230 213 189 / 0.2) 38%,
+    rgb(239 133 87 / 0.55) 48%,
+    rgb(230 213 189 / 0.85) 52%,
+    rgb(239 133 87 / 0.55) 56%,
+    rgb(230 213 189 / 0.2) 66%,
+    rgb(230 213 189 / 0.1) 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: footer-wordmark-shimmer 14s linear infinite;
+  will-change: background-position;
+}
+
+[data-inview='false'] .footer__wordmark {
+  animation-play-state: paused !important;
+}
+
+@keyframes footer-wordmark-shimmer {
+  0% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: -120% 0;
+  }
+}
+
+/* ─── Satellite crossing track ────────────────────────────────────────── */
+.footer__satellite-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(6rem, 15vw, 14rem);
+  height: 32px;
+  pointer-events: none;
+  overflow: clip;
+  z-index: 1;
+}
+
+.footer__satellite {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: flex;
+  align-items: center;
+  transform: translate3d(-100px, -50%, 0);
+  animation: footer-satellite-cross 12s linear infinite;
+  will-change: transform;
+}
+
+[data-inview='false'] .footer__satellite {
+  animation-play-state: paused !important;
+}
+
+.footer__satellite-icon {
+  width: 24px;
+  height: 24px;
+  transform: rotate(18deg);
+  filter: drop-shadow(0 0 4px var(--coral));
+}
+
+.footer__satellite-beam {
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(to left, var(--coral), transparent);
+  margin-left: -4px;
+  opacity: 0.6;
+}
+
+@keyframes footer-satellite-cross {
+  0% {
+    transform: translate3d(-100px, -50%, 0);
+    opacity: 0;
+  }
+  4% {
+    opacity: 0.9;
+  }
+  92% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate3d(calc(100vw + 100px), -50%, 0);
+    opacity: 0;
+  }
+}
+
+/* ─── Reduced motion ──────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .footer__wordmark {
+    animation: none !important;
+    background-position: 50% 0 !important;
+  }
+
+  .footer__satellite-track {
+    display: none !important;
+  }
+}

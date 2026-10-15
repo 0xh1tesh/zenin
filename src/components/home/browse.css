@@ -5,10 +5,13 @@
   background: var(--void);
   content-visibility: auto;
   contain-intrinsic-size: 1px 640px;
+  overflow: clip;
 }
 
 .browse__header {
   margin-bottom: 2.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .browse__eyebrow {
@@ -32,6 +35,8 @@
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 1.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 /* Bento arrangement */
@@ -92,27 +97,139 @@
     box-shadow var(--dur) var(--ease);
 }
 
-.browse-tile::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 120px;
-  height: 120px;
-  background: radial-gradient(circle at 100% 0%, rgb(239 133 87 / 0.08) 0%, transparent 70%);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity var(--dur) var(--ease);
-}
-
 .browse-tile:hover {
   transform: translateY(-4px);
   border-color: var(--coral);
   box-shadow: 0 16px 36px -12px rgb(239 133 87 / 0.15);
 }
 
-.browse-tile:hover::after {
+/* Conic gradient rotating border glow */
+.browse-tile__glow-wrap {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.browse-tile:hover .browse-tile__glow-wrap,
+.browse-tile:focus-within .browse-tile__glow-wrap {
   opacity: 1;
+}
+
+.browse-tile__conic-beam {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 280deg,
+    rgb(239 133 87 / 0.5) 325deg,
+    rgb(230 213 189 / 0.75) 348deg,
+    transparent 360deg
+  );
+  animation: browse-conic-rotate 4s linear infinite;
+  will-change: transform;
+}
+
+[data-inview='false'] .browse-tile__conic-beam {
+  animation-play-state: paused !important;
+}
+
+.browse-tile__backdrop {
+  position: absolute;
+  inset: 1px;
+  background: var(--void-2);
+  border-radius: calc(var(--radius) - 1px);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.browse-tile__content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+/* Corner constellation drawing */
+.tile-constellation {
+  position: absolute;
+  top: 1rem;
+  right: 1.25rem;
+  width: 68px;
+  height: 64px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.6;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.browse-tile:hover .tile-constellation,
+.browse-tile:focus-within .tile-constellation {
+  opacity: 1;
+}
+
+.tile-constellation__svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.constellation__line {
+  stroke-dasharray: 120;
+  stroke-dashoffset: 80;
+  opacity: 0.4;
+  transition:
+    stroke-dashoffset 850ms var(--ease),
+    opacity var(--dur) var(--ease);
+}
+
+.browse-tile:hover .constellation__line,
+.browse-tile:focus-within .constellation__line {
+  stroke-dashoffset: 0;
+  opacity: 0.95;
+}
+
+.constellation__star {
+  fill: var(--coral);
+  transform-origin: center;
+  animation: constellation-star-twinkle 2.8s ease-in-out infinite;
+  animation-delay: var(--star-delay, 0s);
+  will-change: transform, opacity;
+}
+
+[data-inview='false'] .constellation__star {
+  animation-play-state: paused !important;
+}
+
+@keyframes constellation-star-twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes browse-conic-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .browse-tile__header {
@@ -121,6 +238,7 @@
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 1.5rem;
+  padding-right: 50px;
 }
 
 .browse-tile__code {
@@ -178,4 +296,21 @@
 .browse-tile:hover .browse-tile__cta {
   color: var(--coral);
   transform: translateX(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .browse-tile__glow-wrap {
+    display: none !important;
+  }
+
+  .constellation__line {
+    stroke-dashoffset: 0 !important;
+    transition: none !important;
+  }
+
+  .constellation__star {
+    animation: none !important;
+    opacity: 0.6 !important;
+    transform: none !important;
+  }
 }

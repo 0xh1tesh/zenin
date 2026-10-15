@@ -37,10 +37,35 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  position: relative;
   overflow: hidden;
   border-radius: inherit;
   color: inherit;
   text-decoration: none;
+}
+
+/* Diagonal sheen sweep on hover and focus */
+.ecard__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgb(230 213 189 / 0.08) 48%,
+    rgb(239 133 87 / 0.16) 52%,
+    transparent 65%
+  );
+  transform: translate3d(-120%, -120%, 0);
+  transition: transform 700ms var(--ease);
+}
+
+.ecard:hover .ecard__link::after,
+.ecard:focus-within .ecard__link::after,
+.ecard__link:focus-visible::after {
+  transform: translate3d(120%, 120%, 0);
 }
 
 .ecard__link:focus-visible {
@@ -261,3 +286,10 @@
 .ecard--compact .ecard__foot::after {
   display: none;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .ecard__link::after {
+    display: none !important;
+  }
+}
+

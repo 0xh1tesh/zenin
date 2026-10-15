@@ -3,14 +3,63 @@
   border-top: 1px solid var(--line);
   position: relative;
   background: linear-gradient(180deg, var(--void) 0%, var(--void-2) 100%);
+  overflow: clip;
+}
+
+.signal__top-marquee {
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
 }
 
 .signal__header {
   margin-bottom: 2.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .signal__eyebrow {
   margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Blinking live status beacon */
+.signal__status-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-left: 0.75rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: rgb(143 214 160 / 0.12);
+  border: 1px solid rgb(143 214 160 / 0.3);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--ok);
+  text-transform: uppercase;
+}
+
+.signal__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ok);
+  box-shadow: 0 0 6px var(--ok);
+  animation: signal-live-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes signal-live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.7);
+  }
 }
 
 .signal__heading {
@@ -19,16 +68,73 @@
   letter-spacing: -0.02em;
 }
 
+/* Grid wrapper for stats and scanning radar hairline */
+.signal__grid-wrap {
+  position: relative;
+  overflow: clip;
+  border-radius: var(--radius);
+}
+
 .signal__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 @media (min-width: 900px) {
   .signal__grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 2rem;
+  }
+}
+
+/* Radar scanline that sweeps across the big telemetry numbers periodically */
+.signal__scanline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--coral) 30%,
+    var(--sand) 50%,
+    var(--coral) 70%,
+    transparent 100%
+  );
+  box-shadow: 0 0 14px var(--coral), 0 0 4px var(--sand);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  animation: signal-radar-sweep 8.5s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+[data-inview='false'] .signal__scanline {
+  animation-play-state: paused !important;
+}
+
+@keyframes signal-radar-sweep {
+  0% {
+    transform: translate3d(-20px, 0, 0);
+    opacity: 0;
+  }
+  2% {
+    opacity: 0.85;
+  }
+  25% {
+    transform: translate3d(calc(100vw + 20px), 0, 0);
+    opacity: 0.85;
+  }
+  26% {
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(calc(100vw + 20px), 0, 0);
+    opacity: 0;
   }
 }
 
@@ -91,4 +197,15 @@
   width: 60%;
   height: 2.4rem;
   border-radius: var(--radius-sm);
+}
+
+/* Reduced motion disables radar scan and blinks */
+@media (prefers-reduced-motion: reduce) {
+  .signal__scanline {
+    display: none !important;
+  }
+
+  .signal__status-dot {
+    animation: none !important;
+  }
 }

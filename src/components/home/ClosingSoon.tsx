@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import type { EventSummary } from '../../types'
 import { getClosingSoonEvents } from './helpers'
+import { isWithinHours } from '../ambient/ambientHelpers'
+import Caret from '../ambient/Caret'
 import Countdown from '../ui/Countdown'
 import SeatsMeter from '../ui/SeatsMeter'
 import { Skeleton } from '../ui/Skeleton'
@@ -18,7 +20,10 @@ export default function ClosingSoon({ events }: ClosingSoonProps) {
       <div className="container">
         <div className="closing__header">
           <div>
-            <p className="eyebrow closing__eyebrow">03 — Closing soon</p>
+            <p className="eyebrow closing__eyebrow">
+              <span>03 — Closing soon</span>
+              <Caret />
+            </p>
             <h2 className="closing__heading">Registration window closing</h2>
           </div>
           <Link to="/events?open=1&sort=deadline" className="closing__all-link mono">
@@ -50,31 +55,47 @@ export default function ClosingSoon({ events }: ClosingSoonProps) {
           </div>
         ) : (
           <ul className="closing__list">
-            {closingEvents.map((event) => (
-              <li key={event.id} className="closing-row">
-                <Link to={`/events/${event.id}`} className="closing-row__link">
-                  <div className="closing-row__main">
-                    <span className="closing-row__cat mono">{event.category}</span>
-                    <h3 className="closing-row__title">{event.name}</h3>
-                  </div>
+            {closingEvents.map((event) => {
+              const isUrgent = isWithinHours(event.registration_deadline, 72)
 
-                  <div className="closing-row__meta">
-                    <div className="closing-row__seats">
-                      <SeatsMeter event={event} />
+              return (
+                <li key={event.id} className="closing-row">
+                  <Link to={`/events/${event.id}`} className="closing-row__link">
+                    <div className="closing-row__main">
+                      <div className="closing-row__cat-wrap">
+                        {isUrgent && (
+                          <span
+                            className="closing-row__urgent-beacon"
+                            title="Closes within 72 hours"
+                            aria-label="Closes within 72 hours"
+                          >
+                            <span className="closing-row__urgent-pulse" aria-hidden="true" />
+                            <span className="closing-row__urgent-core" aria-hidden="true" />
+                          </span>
+                        )}
+                        <span className="closing-row__cat mono">{event.category}</span>
+                      </div>
+                      <h3 className="closing-row__title">{event.name}</h3>
                     </div>
 
-                    <div className="closing-row__countdown">
-                      <span className="closing-row__label mono">Closes in</span>
-                      <Countdown to={event.registration_deadline} compact />
-                    </div>
+                    <div className="closing-row__meta">
+                      <div className="closing-row__seats">
+                        <SeatsMeter event={event} />
+                      </div>
 
-                    <div className="closing-row__action" aria-hidden="true">
-                      <span className="closing-row__arrow">→</span>
+                      <div className="closing-row__countdown">
+                        <span className="closing-row__label mono">Closes in</span>
+                        <Countdown to={event.registration_deadline} compact />
+                      </div>
+
+                      <div className="closing-row__action" aria-hidden="true">
+                        <span className="closing-row__arrow">→</span>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              </li>
-            ))}
+                  </Link>
+                </li>
+              )
+            })}
           </ul>
         )}
       </div>

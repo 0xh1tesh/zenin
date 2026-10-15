@@ -6,6 +6,7 @@ import { formatDate } from '../../lib/format'
 import type { EventSummary } from '../../types'
 import EventCard from '../EventCard'
 import { Skeleton } from '../ui/Skeleton'
+import Caret from '../ambient/Caret'
 import './home.css'
 
 export interface FieldFlightProps {
@@ -145,7 +146,10 @@ export default function FieldFlight({ events }: FieldFlightProps) {
       <section className="field section" aria-label="Featured events loading">
         <div className="container">
           <div className="field__header">
-            <p className="eyebrow field__eyebrow">02 — Through the field</p>
+            <p className="eyebrow field__eyebrow">
+              <span>02 — Through the field</span>
+              <Caret />
+            </p>
             <h2 className="field__heading">Selected trajectory</h2>
           </div>
           <div className="field__rail" role="status" aria-label="Loading featured events">
@@ -171,7 +175,8 @@ export default function FieldFlight({ events }: FieldFlightProps) {
       <div className={useStage ? 'field__header-stage' : 'container'}>
         <div className="field__header">
           <p className={`eyebrow field__eyebrow${useStage ? ' field__eyebrow--stage' : ''}`}>
-            02 — Through the field
+            <span>02 — Through the field</span>
+            <Caret />
           </p>
           <h2 className="field__heading">Selected trajectory</h2>
         </div>

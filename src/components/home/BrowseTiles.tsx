@@ -1,7 +1,13 @@
+import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import type { EventSummary } from '../../types'
 import { computeBrowseCounts, type BrowseCounts } from './helpers'
 import { Skeleton } from '../ui/Skeleton'
+import Caret from '../ambient/Caret'
+import ShootingStars from '../ambient/ShootingStars'
+import Sparkles from '../ambient/Sparkles'
+import TileConstellation from '../ambient/TileConstellation'
+import { useInView } from '../ambient/useInView'
 import './home.css'
 
 export interface BrowseTilesProps {
@@ -61,13 +67,25 @@ const TILES: readonly TileDef[] = [
 ] as const
 
 export default function BrowseTiles({ events }: BrowseTilesProps) {
+  const sectionRef = useRef<HTMLElement>(null)
+  useInView(sectionRef)
   const counts = computeBrowseCounts(events)
 
   return (
-    <section className="browse section" aria-label="Browse events by category and format">
+    <section
+      ref={sectionRef}
+      className="browse section"
+      aria-label="Browse events by category and format"
+    >
+      <ShootingStars count={3} />
+      <Sparkles count={16} seed={202} />
+
       <div className="container">
         <div className="browse__header">
-          <p className="eyebrow browse__eyebrow">04 — Browse the sky</p>
+          <p className="eyebrow browse__eyebrow">
+            <span>04 — Browse the sky</span>
+            <Caret />
+          </p>
           <h2 className="browse__heading">Sectors &amp; disciplines</h2>
           <p className="browse__subhead">
             Navigate through thirty festival initiatives by discipline, competition arena, or format.
@@ -78,32 +96,47 @@ export default function BrowseTiles({ events }: BrowseTilesProps) {
           {TILES.map((tile) => {
             const count = counts[tile.countKey]
             return (
-              <div key={tile.key} className={`browse__col browse__col--${tile.key}`} role="listitem">
+              <div
+                key={tile.key}
+                className={`browse__col browse__col--${tile.key}`}
+                role="listitem"
+              >
                 <Link
                   to={`/events${tile.query}`}
                   className={`browse-tile browse-tile--${tile.key}`}
                   aria-label={`Browse ${tile.title}: ${count ?? 'loading'} events available`}
                 >
-                  <div className="browse-tile__header">
-                    <span className="browse-tile__code mono">{tile.code}</span>
-                    <span className="browse-tile__count mono" aria-live="polite">
-                      {count === null ? (
-                        <Skeleton className="browse-tile__skel" />
-                      ) : (
-                        `${count} ${count === 1 ? 'event' : 'events'}`
-                      )}
-                    </span>
+                  {/* Rotating conic border glow */}
+                  <div className="browse-tile__glow-wrap" aria-hidden="true">
+                    <div className="browse-tile__conic-beam" />
                   </div>
+                  <div className="browse-tile__backdrop" aria-hidden="true" />
 
-                  <div className="browse-tile__body">
-                    <h3 className="browse-tile__title">{tile.title}</h3>
-                    <p className="browse-tile__tagline">{tile.tagline}</p>
-                  </div>
+                  {/* Corner constellation */}
+                  <TileConstellation categoryKey={tile.key} />
 
-                  <div className="browse-tile__footer">
-                    <span className="browse-tile__cta mono">
-                      Explore sector <span aria-hidden="true">→</span>
-                    </span>
+                  <div className="browse-tile__content">
+                    <div className="browse-tile__header">
+                      <span className="browse-tile__code mono">{tile.code}</span>
+                      <span className="browse-tile__count mono" aria-live="polite">
+                        {count === null ? (
+                          <Skeleton className="browse-tile__skel" />
+                        ) : (
+                          `${count} ${count === 1 ? 'event' : 'events'}`
+                        )}
+                      </span>
+                    </div>
+
+                    <div className="browse-tile__body">
+                      <h3 className="browse-tile__title">{tile.title}</h3>
+                      <p className="browse-tile__tagline">{tile.tagline}</p>
+                    </div>
+
+                    <div className="browse-tile__footer">
+                      <span className="browse-tile__cta mono">
+                        Explore sector <span aria-hidden="true">→</span>
+                      </span>
+                    </div>
                   </div>
                 </Link>
               </div>

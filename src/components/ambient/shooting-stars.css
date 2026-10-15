@@ -1,0 +1,60 @@
+/* ─── Ambient Shooting Stars Decorative Layer ──────────────────────────── */
+
+.shooting-stars-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: clip;
+  z-index: 0;
+  contain: strict;
+}
+
+.shooting-star-streak {
+  position: absolute;
+  width: clamp(100px, 15vw, 160px);
+  height: 1.5px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(239 133 87 / 0.3) 30%,
+    var(--coral) 70%,
+    var(--sand) 95%,
+    transparent 100%
+  );
+  border-radius: 999px;
+  opacity: 0;
+  transform-origin: left center;
+  will-change: transform, opacity;
+  animation: shooting-star-fly var(--shoot-duration, 12s) ease-in infinite;
+  animation-delay: var(--shoot-delay, 0s);
+  filter: drop-shadow(0 0 2px var(--coral));
+}
+
+[data-inview='false'] .shooting-star-streak {
+  animation-play-state: paused !important;
+}
+
+@keyframes shooting-star-fly {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(var(--shoot-angle, -32deg)) scaleX(0.1);
+  }
+  3% {
+    opacity: 0.95;
+    transform: translate3d(70px, 44px, 0) rotate(var(--shoot-angle, -32deg)) scaleX(1);
+  }
+  12% {
+    opacity: 0;
+    transform: translate3d(360px, 225px, 0) rotate(var(--shoot-angle, -32deg)) scaleX(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(360px, 225px, 0) rotate(var(--shoot-angle, -32deg)) scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shooting-stars-layer {
+    display: none !important;
+  }
+}
