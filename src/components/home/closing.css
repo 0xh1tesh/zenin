@@ -2,7 +2,7 @@
 .closing {
   border-top: 1px solid var(--line);
   position: relative;
-  background: var(--void);
+  background: transparent;
   content-visibility: auto;
   contain-intrinsic-size: 1px 540px;
 }

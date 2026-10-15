@@ -2,7 +2,7 @@
 .field {
   border-top: 1px solid var(--line);
   position: relative;
-  background: var(--void);
+  background: transparent;
 }
 
 .field__header {

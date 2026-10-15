@@ -12,6 +12,7 @@ import TopBar from './TopBar'
 import './layout.css'
 
 const ScrollRocket = lazy(() => import('../rocket/ScrollRocket'))
+const CometSky = lazy(() => import('../ambient/CometSky.tsx'))
 
 function PageFallback() {
   return (
@@ -24,6 +25,7 @@ function PageFallback() {
 export default function Layout() {
   const { pathname } = useLocation()
   const [showRocket, setShowRocket] = useState(false)
+  const [showComets, setShowComets] = useState(false)
 
   // Inertial scrolling starts after first paint and only on desktop; see lib/smoothScroll.ts.
   useEffect(() => {
@@ -49,6 +51,12 @@ export default function Layout() {
     return cancelWait
   }, [])
 
+  // Mount CometSky deferred after visitor interaction so it never affects LCP/TBT
+  useEffect(() => {
+    const cancelWait = afterFirstInteraction(() => setShowComets(true))
+    return cancelWait
+  }, [])
+
   return (
     <>
       <a className="skip-link" href="#main">
@@ -68,6 +76,11 @@ export default function Layout() {
       </main>
       <Footer />
       <BottomNav />
+      {showComets && (
+        <Suspense fallback={null}>
+          <CometSky />
+        </Suspense>
+      )}
       {showRocket && (
         <Suspense fallback={null}>
           <ScrollRocket />
