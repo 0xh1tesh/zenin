@@ -13,20 +13,32 @@ interface Star {
   phase: number
   /** Twinkle speed multiplier */
   speed: number
+  /** Subtle cross glint on selected bright hero stars */
+  isHero?: boolean
+  glintSize?: number
 }
 
-function createStars(count: number, w: number, h: number): Star[] {
+function createStars(count: number, w: number, h: number, isMobile: boolean): Star[] {
   const stars: Star[] = []
+  const heroCount = isMobile ? 3 : 6
+
   for (let i = 0; i < count; i++) {
-    const depth = Math.random() > 0.6 ? 1 : 0
+    const isHero = i < heroCount
+    const depth = isHero ? 1 : Math.random() > 0.6 ? 1 : 0
     stars.push({
       x: Math.random() * w,
       y: Math.random() * h,
-      r: depth === 1 ? 0.6 + Math.random() * 1.2 : 0.3 + Math.random() * 0.6,
+      r: isHero
+        ? 1.3 + Math.random() * 0.6
+        : depth === 1
+          ? 0.6 + Math.random() * 1.2
+          : 0.3 + Math.random() * 0.6,
       depth,
-      base: 0.4 + Math.random() * 0.6,
+      base: isHero ? 0.75 + Math.random() * 0.25 : 0.4 + Math.random() * 0.6,
       phase: Math.random() * Math.PI * 2,
       speed: 0.3 + Math.random() * 0.7,
+      isHero,
+      glintSize: isHero ? 4.5 + Math.random() * 3.5 : undefined,
     })
   }
   return stars
@@ -47,6 +59,18 @@ function drawStars(
     ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2)
     ctx.fillStyle = `rgba(234,230,222,${alpha})`
     ctx.fill()
+
+    if (s.isHero && s.glintSize) {
+      const glintAlpha = alpha * 0.65
+      ctx.strokeStyle = `rgba(234,230,222,${glintAlpha})`
+      ctx.lineWidth = 0.75
+      ctx.beginPath()
+      ctx.moveTo(s.x - s.glintSize, s.y)
+      ctx.lineTo(s.x + s.glintSize, s.y)
+      ctx.moveTo(s.x, s.y - s.glintSize)
+      ctx.lineTo(s.x, s.y + s.glintSize)
+      ctx.stroke()
+    }
   }
 }
 
@@ -69,7 +93,7 @@ export default function StarField() {
 
     const isMobile = rect.width <= 640
     const count = isMobile ? 70 : 140
-    starsRef.current = createStars(count, w, h)
+    starsRef.current = createStars(count, w, h, isMobile)
 
     const ctx = canvas.getContext('2d')
     if (!ctx) return

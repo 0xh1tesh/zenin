@@ -1,13 +1,34 @@
 import { useEffect, type RefObject } from 'react'
 import { afterFirstInteraction, loadGsap, useReducedMotion } from '../../lib/motion'
-import { ORBITS, orbitPoint } from './Orbits'
+import {
+  ORBITS,
+  orbitPoint,
+  buildTailPath,
+  computeOrbitDashOffset,
+  type OrbitSpec,
+} from './Orbits'
 
 const DIVE_ORIGIN = '50% 100%'
 
+interface MoonNodes {
+  spec: OrbitSpec
+  frontWrap: SVGGElement | null
+  backWrap: SVGGElement | null
+  frontTail: SVGPathElement | null
+  backTail: SVGPathElement | null
+  frontHighlight: SVGEllipseElement | null
+  backHighlight: SVGEllipseElement | null
+  frontTailGrad: SVGLinearGradientElement | null
+  backTailGrad: SVGLinearGradientElement | null
+  sparkle?: SVGElement | null
+  lastFront?: boolean
+}
+
 /**
- * Scroll-scrubbed "camera dive" through the layered scene. Loads GSAP after first paint,
- * animates only transform/opacity on the layers (plus two tiny SVG moons) and reverts on unmount.
- * With reduced motion nothing is created and the static composition is shown.
+ * Orchestrates hero camera dive via GSAP and continuous real-time orbital moon motion.
+ * Uses a single requestAnimationFrame loop that starts after first interaction or idle,
+ * pauses when offscreen (IntersectionObserver) or hidden, and is cleaned up on unmount.
+ * Scrolling adds angular velocity so moons accelerate dynamically during scroll.
  */
 export function useHeroScroll(track: RefObject<HTMLElement | null>) {
   const reduced = useReducedMotion()
@@ -18,8 +39,128 @@ export function useHeroScroll(track: RefObject<HTMLElement | null>) {
 
     let cancelled = false
     let revert: (() => void) | undefined
+    let rafId = 0
+    let isRunning = false
+    let startTime = 0
+    let visible = true
+    let docVisible = typeof document !== 'undefined' ? !document.hidden : true
+    const scrollProgress = { current: 0 }
 
-    const init = async () => {
+    // Pre-query moon elements once to avoid per-frame DOM queries
+    const moons: MoonNodes[] = ORBITS.map((spec, i) => ({
+      spec,
+      frontWrap: el.querySelector<SVGGElement>(`.hero__orbits--front [data-orbit="${i}"]`),
+      backWrap: el.querySelector<SVGGElement>(`.hero__orbits--back [data-orbit="${i}"]`),
+      frontTail: el.querySelector<SVGPathElement>(`.hero__orbits--front [data-tail="${i}"]`),
+      backTail: el.querySelector<SVGPathElement>(`.hero__orbits--back [data-tail="${i}"]`),
+      frontHighlight: el.querySelector<SVGEllipseElement>(`.hero__orbits--front [data-highlight="${i}"]`),
+      backHighlight: el.querySelector<SVGEllipseElement>(`.hero__orbits--back [data-highlight="${i}"]`),
+      frontTailGrad: el.querySelector<SVGLinearGradientElement>(`#hero-tail-grad-front-${i}`),
+      backTailGrad: el.querySelector<SVGLinearGradientElement>(`#hero-tail-grad-back-${i}`),
+      sparkle: i === 0 ? el.querySelector<SVGElement>('[data-moon-sparkle]') : null,
+      lastFront: Math.sin(spec.start) > 0,
+    }))
+
+    const updateFrame = (now: number) => {
+      const elapsed = (now - startTime) / 1000
+      const scrollT = scrollProgress.current
+      const isMobile = window.innerWidth <= 640
+
+      for (let i = 0; i < moons.length; i++) {
+        const m = moons[i]
+        const spec = m.spec
+        // ~48s revolution at speed=1; scroll adds 2.4 revolutions
+        const idleAngle = (elapsed / 48) * (Math.PI * 2) * spec.speed
+        const scrollAngle = scrollT * (Math.PI * 2) * 2.4 * spec.speed
+        const angle = spec.start + idleAngle + scrollAngle
+
+        const point = orbitPoint(spec, angle)
+        const isFront = point.front
+        const tail = buildTailPath(spec, angle, 0.45, 8)
+
+        // Toggle front/back layer visibility on transition
+        if (m.lastFront !== isFront) {
+          m.lastFront = isFront
+          if (m.frontWrap) m.frontWrap.style.display = isFront ? '' : 'none'
+          if (m.backWrap) m.backWrap.style.display = isFront ? 'none' : ''
+          if (m.frontTail) m.frontTail.style.display = isFront ? '' : 'none'
+          if (m.backTail) m.backTail.style.display = isFront ? 'none' : ''
+          if (m.frontHighlight) m.frontHighlight.style.display = isFront ? '' : 'none'
+          if (m.backHighlight) m.backHighlight.style.display = isFront ? 'none' : ''
+        }
+
+        const activeWrap = isFront ? m.frontWrap : m.backWrap
+        const activeTail = isFront ? m.frontTail : m.backTail
+        const activeHighlight = isFront ? m.frontHighlight : m.backHighlight
+        const activeGrad = isFront ? m.frontTailGrad : m.backTailGrad
+
+        if (activeWrap) {
+          activeWrap.setAttribute('transform', `translate(${point.x.toFixed(1)}, ${point.y.toFixed(1)})`)
+        }
+        if (activeTail) {
+          activeTail.setAttribute('d', tail.d)
+        }
+        if (activeHighlight) {
+          const dashOffset = computeOrbitDashOffset(spec.rx, spec.ry, angle, 50)
+          activeHighlight.setAttribute('stroke-dashoffset', dashOffset.toFixed(1))
+        }
+
+        // On desktop: update gradient endpoints and lens flare sparkle
+        if (!isMobile) {
+          if (activeGrad) {
+            activeGrad.setAttribute('x1', tail.head.x.toFixed(1))
+            activeGrad.setAttribute('y1', tail.head.y.toFixed(1))
+            activeGrad.setAttribute('x2', tail.tail.x.toFixed(1))
+            activeGrad.setAttribute('y2', tail.tail.y.toFixed(1))
+          }
+
+          if (i === 0 && m.sparkle) {
+            const sinA = Math.sin(angle)
+            if (isFront && sinA > 0.85) {
+              const flareIntensity = (sinA - 0.85) / 0.15
+              const twinkle = flareIntensity * (0.7 + 0.3 * Math.sin(now * 0.012))
+              m.sparkle.setAttribute('opacity', twinkle.toFixed(2))
+              const flareScale = (0.7 + 0.5 * flareIntensity).toFixed(2)
+              const rot = ((now * 0.04) % 360).toFixed(1)
+              m.sparkle.setAttribute('transform', `scale(${flareScale}) rotate(${rot})`)
+            } else {
+              m.sparkle.setAttribute('opacity', '0')
+            }
+          }
+        }
+      }
+    }
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting
+      },
+      { threshold: 0 },
+    )
+    io.observe(el)
+
+    const onVisibility = () => {
+      docVisible = !document.hidden
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
+    const startLoop = () => {
+      if (isRunning || cancelled || reduced) return
+      isRunning = true
+      startTime = performance.now()
+
+      const tick = (now: number) => {
+        if (cancelled) return
+        if (visible && docVisible) {
+          updateFrame(now)
+        }
+        rafId = requestAnimationFrame(tick)
+      }
+      rafId = requestAnimationFrame(tick)
+    }
+
+    // Initialize GSAP scroll timeline
+    const initGsap = async () => {
       const { gsap } = await loadGsap()
       if (cancelled) return
       const mobile = window.matchMedia('(max-width: 640px)').matches
@@ -48,25 +189,15 @@ export function useHeroScroll(track: RefObject<HTMLElement | null>) {
         tl.to(q('.hero__ctas, .hero__stats, .hero__next, .hero__scroll-cue'), { opacity: 0, duration: 0.2 }, 0.78)
         tl.to(q('.hero__fog'), { opacity: 1, duration: 0.25 }, 0.75)
 
-        // Moons ride their elliptical orbits; the far half of an orbit dims for depth.
-        const moons = ORBITS.map((spec, i) => ({
-          spec,
-          node: el.querySelector<SVGCircleElement>(`[data-orbit="${i}"]`),
-        }))
-        const progress = { t: 0 }
+        // Connect scroll scrub progress to our continuous orbital math
+        const progressObj = { t: 0 }
         tl.to(
-          progress,
+          progressObj,
           {
             t: 1,
             duration: 1,
             onUpdate: () => {
-              for (const { spec, node } of moons) {
-                if (!node) continue
-                const point = orbitPoint(spec, spec.start + progress.t * Math.PI * 2.4 * spec.speed)
-                node.setAttribute('cx', point.x.toFixed(1))
-                node.setAttribute('cy', point.y.toFixed(1))
-                node.style.opacity = point.front ? '0.9' : '0.3'
-              }
+              scrollProgress.current = progressObj.t
             },
           },
           0,
@@ -76,12 +207,26 @@ export function useHeroScroll(track: RefObject<HTMLElement | null>) {
       revert = () => ctx.revert()
     }
 
-    // The scene is already composed and pinned by CSS; the scrub only needs to exist once the visitor scrolls.
-    const cancelWait = afterFirstInteraction(() => void init())
+    // Start rAF loop on idle or first interaction
+    let idleTimer: number | undefined
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      idleTimer = window.requestIdleCallback(() => startLoop(), { timeout: 2000 })
+    }
+
+    const cancelWait = afterFirstInteraction(() => {
+      startLoop()
+      void initGsap()
+    }, 2500)
 
     return () => {
       cancelled = true
       cancelWait()
+      if (idleTimer !== undefined && 'cancelIdleCallback' in window) {
+        window.cancelIdleCallback(idleTimer)
+      }
+      cancelAnimationFrame(rafId)
+      io.disconnect()
+      document.removeEventListener('visibilitychange', onVisibility)
       revert?.()
     }
   }, [track, reduced])
