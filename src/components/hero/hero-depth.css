@@ -173,8 +173,14 @@
     margin-bottom: 1.25rem;
   }
 
+  /* Label, full name and countdown stack in one centred column on phones */
+  .hero__next {
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
   .hero__next-name {
-    max-width: 24ch;
+    max-width: 30ch;
     text-align: center;
   }
 }
