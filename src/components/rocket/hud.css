@@ -61,18 +61,16 @@
   text-transform: uppercase;
 }
 
-/* Line 2: Section name (max ~22ch with CSS truncation) */
+/* Line 2: Section name, always shown in full: long names wrap onto a second line rather than ending in an ellipsis */
 .rocket-hud__section {
   color: var(--bone);
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  max-width: 22ch;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  line-height: 1.15;
+  max-width: 24ch;
+  line-height: 1.3;
+  text-wrap: balance;
 }
 
 /* Reduced Motion */

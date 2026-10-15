@@ -172,12 +172,10 @@
 }
 
 .ecard__title {
-  display: -webkit-box;
-  overflow: hidden;
+  /* Event names are never cut off with an ellipsis; they wrap in full. */
   font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.3rem);
   line-height: 1.15;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  text-wrap: balance;
 }
 
 .ecard__blurb {
@@ -246,7 +244,6 @@
   }
   .ecard--feature .ecard__title {
     font-size: var(--step-2);
-    -webkit-line-clamp: 3;
   }
   .ecard--feature .ecard__blurb {
     font-size: var(--step-0);
