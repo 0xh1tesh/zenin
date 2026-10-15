@@ -29,6 +29,10 @@ import { RocketCraft } from './RocketCraft'
 import './rocket.css'
 
 const DOCK_VISIBLE_AT = 0.93
+/** Easing of the drawn position toward its target per frame. */
+const POS_EASE = 0.35
+/** y of the pad's landing line inside its 54x18 SVG. */
+const PAD_SURFACE_Y = 14
 
 /**
  * ScrollRocket: A code-drawn cosmic rocket that travels with the visitor
@@ -74,6 +78,23 @@ export default function ScrollRocket() {
     if (dockStateRef.current.landed !== landed) setIsLandedState(landed)
     if (dockStateRef.current.visible !== visible) setIsDockVisible(visible)
     dockStateRef.current = { landed, visible }
+  }, [])
+
+  // Last drawn craft position, eased separately so the hop from track to pad is smooth.
+  const posRef = useRef<{ x: number; y: number } | null>(null)
+
+  /** Where the craft stands on the landing pad, in overlay coordinates; null until the pad is rendered. */
+  const padAnchor = useCallback((): { x: number; y: number } | null => {
+    const overlay = containerRef.current
+    const pad = overlay?.querySelector('.rocket-dock__svg')
+    if (!overlay || !pad) return null
+    const padBox = pad.getBoundingClientRect()
+    const overlayBox = overlay.getBoundingClientRect()
+    const halfCraft = window.innerWidth < 640 ? 19 : 24
+    return {
+      x: padBox.left - overlayBox.left + padBox.width / 2,
+      y: padBox.top - overlayBox.top + PAD_SURFACE_Y - halfCraft,
+    }
   }, [])
 
   // Particle pool allocated once
@@ -147,9 +168,14 @@ export default function ScrollRocket() {
     syncDockState(landed, currP > DOCK_VISIBLE_AT)
 
     // Compute path point and tangent
-    const pt = computePathPoint(currP, currentDims)
+    // Once landed the craft leaves the track, glides onto the pad and stands upright.
+    const pad = landed ? padAnchor() : null
+    const target = pad ?? computePathPoint(currP, currentDims)
+    const prev = posRef.current ?? target
+    const pt = { x: lerp(prev.x, target.x, POS_EASE), y: lerp(prev.y, target.y, POS_EASE) }
+    posRef.current = pt
     const tangent = computePathTangent(currP, currentDims)
-    const targetAngle = computeRocketAngle(tangent.dx, tangent.dy, isScrollingUpRef.current)
+    const targetAngle = pad ? 0 : computeRocketAngle(tangent.dx, tangent.dy, isScrollingUpRef.current)
     const nextAngle = lerpAngle(currentAngleRef.current, targetAngle, 0.18)
     currentAngleRef.current = nextAngle
 
@@ -200,8 +226,14 @@ export default function ScrollRocket() {
     )
 
     // Settling check: stop rAF loop when physical movement and particles are done
+    const angleGap = Math.abs(((targetAngle - nextAngle + 540) % 360) - 180)
     const isSettled =
-      Math.abs(targetP - currP) < 0.0003 && vel < 0.01 && activeCount === 0 && !isLaunching
+      Math.abs(targetP - currP) < 0.0003 &&
+      Math.hypot(target.x - pt.x, target.y - pt.y) < 0.5 &&
+      angleGap < 0.5 &&
+      vel < 0.01 &&
+      activeCount === 0 &&
+      !isLaunching
 
     if (isSettled) {
       currentProgressRef.current = targetP
@@ -209,7 +241,7 @@ export default function ScrollRocket() {
     } else {
       scheduleFrame()
     }
-  }, [isLaunching, syncDockState])
+  }, [isLaunching, syncDockState, padAnchor])
 
   const scheduleFrame = useCallback(() => {
     if (typeof document !== 'undefined' && document.hidden) return
@@ -320,7 +352,7 @@ export default function ScrollRocket() {
 
   return (
     // Not aria-hidden as a whole: the dock holds a real, focusable button. Each decorative child hides itself.
-    <div ref={containerRef} className="rocket-overlay">
+    <div ref={containerRef} className="rocket-overlay" style={{ width: dims.overlayWidth }}>
       {/* Flight trajectory lines */}
       <svg
         className="rocket-track-svg"

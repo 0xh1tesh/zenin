@@ -6,18 +6,14 @@
   top: 0;
   right: 0;
   bottom: 0;
+  /* The width comes inline from the flight geometry so the craft and the drawn track share one coordinate space. */
   width: 90px;
   max-width: 100vw;
   z-index: 35;
   pointer-events: none;
-  overflow: clip;
-  contain: layout style paint;
-}
-
-@media (max-width: 639px) {
-  .rocket-overlay {
-    width: 44px;
-  }
+  /* Not clipped: the dock's button extends left of this strip; a fixed box never adds page scroll. */
+  overflow: visible;
+  contain: layout style;
 }
 
 /* ─── Trajectory Track SVG ───────────────────────────────────────────── */
