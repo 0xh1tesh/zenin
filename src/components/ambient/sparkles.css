@@ -13,9 +13,14 @@
   position: absolute;
   display: block;
   transform-origin: center;
-  will-change: transform, opacity;
   animation: sparkle-twinkle var(--sparkle-duration, 3.5s) ease-in-out infinite;
   animation-delay: var(--sparkle-delay, 0s);
+}
+
+/* Both are spans: without display:block the sizes are ignored and the glint SVG fills the section. */
+.sparkle-dot,
+.sparkle-glint {
+  display: block;
 }
 
 .sparkle-dot {
