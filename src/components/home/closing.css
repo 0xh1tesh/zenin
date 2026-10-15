@@ -55,6 +55,8 @@
 }
 
 .closing-row {
+  position: relative;
+  overflow: hidden;
   background: var(--void-2);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
@@ -64,10 +66,83 @@
     transform var(--dur) var(--ease);
 }
 
+/* Soft light sweep across a row on hover/focus */
+.closing-row::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgb(239 133 87 / 0.08) 46%,
+    rgb(230 213 189 / 0.14) 50%,
+    rgb(239 133 87 / 0.08) 54%,
+    transparent 75%
+  );
+  transform: translate3d(-100%, 0, 0);
+  transition: transform 650ms var(--ease);
+}
+
+.closing-row:hover::after,
+.closing-row:focus-within::after {
+  transform: translate3d(100%, 0, 0);
+}
+
 .closing-row:hover {
   border-color: var(--line-strong);
   background: var(--void-3);
   transform: translateY(-2px);
+}
+
+.closing-row__cat-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* 72-hour pulsing beacon */
+.closing-row__urgent-beacon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+}
+
+.closing-row__urgent-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--coral);
+  opacity: 0.7;
+  animation: urgent-beacon-ring 2s ease-out infinite;
+}
+
+.closing-row__urgent-core {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--coral);
+  box-shadow: 0 0 6px var(--coral);
+}
+
+@keyframes urgent-beacon-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  70% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
 }
 
 .closing-row__link {
@@ -203,3 +278,15 @@
   width: 110px;
   height: 1.5rem;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .closing-row::after {
+    display: none !important;
+  }
+
+  .closing-row__urgent-pulse {
+    animation: none !important;
+    display: none !important;
+  }
+}
+

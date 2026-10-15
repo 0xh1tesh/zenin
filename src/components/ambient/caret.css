@@ -1,0 +1,31 @@
+/* ─── Mission-control Eyebrow Blinking Caret ──────────────────────────── */
+
+.ambient-caret {
+  display: inline-block;
+  margin-left: 0.25ch;
+  color: var(--coral);
+  font-weight: 700;
+  animation: ambient-caret-blink 1.2s steps(2, start) infinite;
+  user-select: none;
+}
+
+[data-inview='false'] .ambient-caret {
+  animation-play-state: paused !important;
+}
+
+@keyframes ambient-caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-caret {
+    animation: none !important;
+    opacity: 0.8 !important;
+  }
+}

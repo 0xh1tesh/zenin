@@ -1,0 +1,63 @@
+/* ─── Ambient Sparkles & Starfield Dust Layer ───────────────────────── */
+
+.sparkles-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: clip;
+  z-index: 0;
+  contain: strict;
+}
+
+.sparkle-item {
+  position: absolute;
+  display: block;
+  transform-origin: center;
+  will-change: transform, opacity;
+  animation: sparkle-twinkle var(--sparkle-duration, 3.5s) ease-in-out infinite;
+  animation-delay: var(--sparkle-delay, 0s);
+}
+
+.sparkle-dot {
+  width: var(--sparkle-size, 3px);
+  height: var(--sparkle-size, 3px);
+  border-radius: 50%;
+  background: var(--sand);
+  box-shadow: 0 0 3px rgb(230 213 189 / 0.5);
+}
+
+.sparkle-glint {
+  width: calc(var(--sparkle-size, 4px) * 2.2);
+  height: calc(var(--sparkle-size, 4px) * 2.2);
+  color: var(--coral);
+}
+
+.sparkle-glint svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+[data-inview='false'] .sparkle-item {
+  animation-play-state: paused !important;
+}
+
+@keyframes sparkle-twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.65);
+  }
+  50% {
+    opacity: var(--sparkle-opacity, 0.85);
+    transform: scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sparkle-item {
+    animation: none !important;
+    opacity: 0.25 !important;
+    transform: none !important;
+  }
+}

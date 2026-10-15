@@ -1,0 +1,103 @@
+/* ─── Ambient Marquee Ticker Band ────────────────────────────────────── */
+
+.marquee-wrap {
+  position: relative;
+  width: 100%;
+  overflow: clip;
+  padding-block: 0.65rem;
+  background: var(--void-2);
+  border-block: 1px solid var(--line);
+  user-select: none;
+  contain: paint;
+}
+
+.marquee-wrap--tilted {
+  transform: rotate(-1.5deg) scale(1.02);
+  margin-block: 1.5rem;
+  border-block-color: var(--line-strong);
+  box-shadow: 0 4px 20px rgb(0 0 0 / 0.4);
+}
+
+.marquee-track-container {
+  display: flex;
+  width: 100%;
+  overflow: clip;
+}
+
+.marquee-track {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  min-width: 100%;
+  gap: 2.25rem;
+  padding-right: 2.25rem;
+  white-space: nowrap;
+  animation: marquee-scroll var(--marquee-duration, 32s) linear infinite;
+  will-change: transform;
+}
+
+.marquee--reverse .marquee-track {
+  animation-name: marquee-scroll-reverse;
+}
+
+.marquee-track-container:hover .marquee-track,
+.marquee-track-container:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+[data-inview='false'] .marquee-track {
+  animation-play-state: paused !important;
+}
+
+.marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.25rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  color: var(--sand);
+  text-transform: uppercase;
+}
+
+.marquee-star {
+  display: inline-block;
+  color: var(--coral);
+  font-size: 0.85rem;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+@keyframes marquee-scroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@keyframes marquee-scroll-reverse {
+  0% {
+    transform: translate3d(-100%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Reduced motion disables scroll cleanly */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-wrap--tilted {
+    transform: none !important;
+    margin-block: 0.75rem !important;
+  }
+
+  .marquee-track {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .marquee-track:nth-child(2) {
+    display: none !important;
+  }
+}

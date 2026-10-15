@@ -5,6 +5,11 @@
   background: var(--void);
   content-visibility: auto;
   contain-intrinsic-size: 1px 400px;
+  overflow: clip;
+}
+
+.cta-band__ticker-wrap {
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
 }
 
 .cta-band__card {
@@ -24,7 +29,12 @@
   width: 600px;
   height: 600px;
   transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgb(239 133 87 / 0.12) 0%, rgb(213 54 12 / 0.04) 50%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgb(239 133 87 / 0.16) 0%,
+    rgb(213 54 12 / 0.06) 50%,
+    transparent 70%
+  );
   pointer-events: none;
 }
 
@@ -46,6 +56,75 @@
   align-items: center;
   max-width: 64ch;
   margin-inline: auto;
+}
+
+/* ─── Circular Rotating Text Badge & Center Planet ────────────────────── */
+.cta-band__badge {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin-bottom: 2rem;
+  display: grid;
+  place-items: center;
+}
+
+.cta-band__planet {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  z-index: 2;
+}
+
+.cta-band__planet-core {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--coral) 0%, var(--vermilion) 75%, #4a1204 100%);
+  box-shadow: 0 0 16px rgb(239 133 87 / 0.5), inset -2px -2px 6px rgb(0 0 0 / 0.6);
+}
+
+.cta-band__planet-ring {
+  position: absolute;
+  width: 52px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgb(230 213 189 / 0.4);
+  transform: rotate(-22deg);
+  box-shadow: 0 0 8px rgb(239 133 87 / 0.25);
+  pointer-events: none;
+}
+
+.cta-band__badge-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: cta-badge-spin 26s linear infinite;
+  transform-origin: center;
+  will-change: transform;
+}
+
+[data-inview='false'] .cta-band__badge-svg {
+  animation-play-state: paused !important;
+}
+
+.cta-band__badge-text {
+  fill: var(--sand);
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+@keyframes cta-badge-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .cta-band__eyebrow {
@@ -71,8 +150,47 @@
   display: flex;
   gap: 1.25rem;
   justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
   margin-bottom: 2.5rem;
+}
+
+/* ─── Breathing halo behind primary CTA button ───────────────────────── */
+.cta-band__btn-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.cta-band__btn-halo {
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle,
+    rgb(239 133 87 / 0.75) 0%,
+    rgb(213 54 12 / 0.35) 60%,
+    transparent 85%
+  );
+  filter: blur(10px);
+  pointer-events: none;
+  animation: cta-halo-breathe 3.6s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+[data-inview='false'] .cta-band__btn-halo {
+  animation-play-state: paused !important;
+}
+
+@keyframes cta-halo-breathe {
+  0%,
+  100% {
+    transform: scale(0.94);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.9;
+  }
 }
 
 .cta-band__telemetry {
@@ -88,4 +206,17 @@
 
 .cta-band__dot {
   color: var(--coral);
+}
+
+/* Reduced motion disables spinning badge and halo breath */
+@media (prefers-reduced-motion: reduce) {
+  .cta-band__badge-svg {
+    animation: none !important;
+  }
+
+  .cta-band__btn-halo {
+    animation: none !important;
+    transform: none !important;
+    opacity: 0.4 !important;
+  }
 }

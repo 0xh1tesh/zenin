@@ -80,6 +80,7 @@
   border: 1px solid var(--line);
   border-radius: var(--radius);
   overflow: hidden;
+  position: relative;
 }
 
 .programme__month-head {
@@ -89,6 +90,54 @@
   padding: 1.25rem 1.5rem;
   background: var(--void-3);
   border-bottom: 1px solid var(--line);
+}
+
+.programme__month-title-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Orbiting celestial dot around month header */
+.programme__orbit {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.programme__orbit-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px dashed rgb(239 133 87 / 0.45);
+}
+
+.programme__orbit-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
+  background: var(--coral);
+  box-shadow: 0 0 5px var(--coral);
+  animation: prog-orbit-spin 5.5s linear infinite;
+  will-change: transform;
+}
+
+[data-inview='false'] .programme__orbit-dot {
+  animation-play-state: paused !important;
+}
+
+@keyframes prog-orbit-spin {
+  0% {
+    transform: rotate(0deg) translateX(8px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(8px) rotate(-360deg);
+  }
 }
 
 .programme__month-title {
@@ -107,6 +156,64 @@
 .programme__month-list {
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+/* Travelling light pulse down timeline spine */
+.programme__month-spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: var(--line);
+  pointer-events: none;
+  overflow: clip;
+  z-index: 1;
+}
+
+.programme__spine-pulse {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 75px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--coral) 50%,
+    var(--sand) 85%,
+    transparent 100%
+  );
+  box-shadow: 0 0 8px var(--coral);
+  animation: prog-spine-pulse 7s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+[data-inview='false'] .programme__spine-pulse {
+  animation-play-state: paused !important;
+}
+
+@keyframes prog-spine-pulse {
+  0% {
+    transform: translate3d(0, -80px, 0);
+    opacity: 0;
+  }
+  4% {
+    opacity: 0.95;
+  }
+  38% {
+    transform: translate3d(0, 420px, 0);
+    opacity: 0.95;
+  }
+  42% {
+    opacity: 0;
+    transform: translate3d(0, 480px, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 480px, 0);
+  }
 }
 
 .programme__item:not(:last-child) {
@@ -245,4 +352,15 @@
 .programme-row__meta-skel {
   width: 80px;
   height: 1.2rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .programme__spine-pulse {
+    display: none !important;
+  }
+
+  .programme__orbit-dot {
+    animation: none !important;
+    transform: translateX(8px) !important;
+  }
 }
