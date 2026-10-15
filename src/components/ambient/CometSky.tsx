@@ -20,11 +20,11 @@ import {
   type RgbTriple,
   type StarDustPoint,
   type StaticCometStreak,
-} from './cometSky'
+} from './cometMath'
 import './comet-sky.css'
 
 const MAX_COMETS = 4
-const MAX_HISTORY = 28
+const MAX_HISTORY = 44
 const MAX_SPARKS = 24
 
 interface ActiveComet {
@@ -101,9 +101,9 @@ function drawHead(
   dpr: number,
   glowRgba: string,
 ) {
-  const outer = radius * 3.8 * dpr
+  const outer = radius * 5 * dpr
   const grad = ctx.createRadialGradient(x, y, 0, x, y, outer)
-  grad.addColorStop(0, 'rgba(234, 230, 222, 0.85)')
+  grad.addColorStop(0, 'rgba(234, 230, 222, 0.95)')
   grad.addColorStop(0.35, glowRgba)
   grad.addColorStop(1, 'rgba(239, 133, 87, 0)')
   ctx.fillStyle = grad
@@ -152,7 +152,7 @@ function renderStaticFrame(
     for (let i = 0; i < samples.length - 1; i++) {
       const pA = samples[i]
       const pB = samples[i + 1]
-      const alpha = Math.min(0.48, 0.45 * Math.pow(1 - pA.age, 1.2))
+      const alpha = Math.min(0.72, 0.7 * Math.pow(1 - pA.age, 1.1))
       ctx.beginPath()
       ctx.moveTo(pA.x * dpr, pA.y * dpr)
       ctx.lineTo(pB.x * dpr, pB.y * dpr)
@@ -344,7 +344,7 @@ export default function CometSky() {
         if (curCount >= 2) {
           for (let i = 0; i < curCount - 1; i++) {
             const age = i / MAX_HISTORY
-            const alpha = Math.min(0.48, 0.45 * Math.pow(1 - age, 1.2))
+            const alpha = Math.min(0.72, 0.7 * Math.pow(1 - age, 1.1))
             ctx.beginPath()
             ctx.moveTo(c.historyX[i] * dpr, c.historyY[i] * dpr)
             ctx.lineTo(c.historyX[i + 1] * dpr, c.historyY[i + 1] * dpr)

@@ -12,7 +12,7 @@ import TopBar from './TopBar'
 import './layout.css'
 
 const ScrollRocket = lazy(() => import('../rocket/ScrollRocket'))
-const CometSky = lazy(() => import('../ambient/CometSky.tsx'))
+const CometSky = lazy(() => import('../ambient/CometSky'))
 
 function PageFallback() {
   return (

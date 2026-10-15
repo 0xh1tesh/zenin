@@ -88,11 +88,11 @@ export function shouldSkipFrame(
   return currentTime - lastFrameTime < 1000 / targetFps
 }
 
-/** Generates the next spawn interval in milliseconds (2.5s - 7.0s). */
+/** Generates the next spawn interval in milliseconds (1.2s - 3.6s): frequent enough that a scrolling visitor sees them. */
 export function getNextSpawnInterval(
   rand: () => number,
-  minSec = 2.5,
-  maxSec = 7.0,
+  minSec = 1.2,
+  maxSec = 3.6,
 ): number {
   return (minSec + rand() * (maxSec - minSec)) * 1000
 }

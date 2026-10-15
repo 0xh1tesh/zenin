@@ -15,7 +15,7 @@ import {
   pickCometColor,
   sampleTrajectoryHistory,
   shouldSkipFrame,
-} from './cometSky'
+} from './cometMath'
 
 describe('createSeededRandom', () => {
   it('returns identical sequences for the same seed', () => {
@@ -70,12 +70,12 @@ describe('shouldSkipFrame (30fps gate)', () => {
 })
 
 describe('spawn scheduling (getNextSpawnInterval, canSpawnComet, isSpawnDue)', () => {
-  it('generates spawn interval strictly within 2.5s - 7.0s (2500ms - 7000ms)', () => {
+  it('generates spawn interval strictly within 1.2s - 3.6s', () => {
     const rand = createSeededRandom(42)
     for (let i = 0; i < 50; i++) {
-      const interval = getNextSpawnInterval(rand, 2.5, 7.0)
-      expect(interval).toBeGreaterThanOrEqual(2500)
-      expect(interval).toBeLessThanOrEqual(7000)
+      const interval = getNextSpawnInterval(rand)
+      expect(interval).toBeGreaterThanOrEqual(1200)
+      expect(interval).toBeLessThanOrEqual(3600)
     }
   })
 
