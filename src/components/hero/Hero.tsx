@@ -40,7 +40,7 @@ function Letters({ text, offset = 0, accent = false }: { text: string; offset?: 
 function Stat({ value, label }: { value: number | null; label: string }) {
   return (
     <div className="hero__stat">
-      <span className={`hero__stat-value${value === null ? ' hero__stat-value--loading' : ''}`}>{value ?? '—'}</span>
+      <span className={`hero__stat-value${value === null ? ' hero__stat-value--loading' : ''}`}>{value ?? '·'}</span>
       <span className="hero__stat-label">{label}</span>
     </div>
   )
@@ -68,7 +68,7 @@ export default function Hero({ stats }: { stats: HeroStats }) {
         <div className="hero__fog" aria-hidden="true" />
 
         <div className="hero__overlay">
-          <p className="eyebrow hero__eyebrow">Coimbatore · 26 Sep – 15 Nov 2026</p>
+          <p className="eyebrow hero__eyebrow">Coimbatore · 26 Sep to 15 Nov 2026</p>
           <h1 className="hero__h1">
             <span className="sr-only">Zenin &apos;26</span>
             <span className="hero__h1-visual" aria-hidden="true">

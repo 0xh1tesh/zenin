@@ -147,7 +147,7 @@ export default function FieldFlight({ events }: FieldFlightProps) {
         <div className="container">
           <div className="field__header">
             <p className="eyebrow field__eyebrow">
-              <span>02 — Through the field</span>
+              <span>02 · Through the field</span>
               <Caret />
             </p>
             <h2 className="field__heading">Selected trajectory</h2>
@@ -175,7 +175,7 @@ export default function FieldFlight({ events }: FieldFlightProps) {
       <div className={useStage ? 'field__header-stage' : 'container'}>
         <div className="field__header">
           <p className={`eyebrow field__eyebrow${useStage ? ' field__eyebrow--stage' : ''}`}>
-            <span>02 — Through the field</span>
+            <span>02 · Through the field</span>
             <Caret />
           </p>
           <h2 className="field__heading">Selected trajectory</h2>

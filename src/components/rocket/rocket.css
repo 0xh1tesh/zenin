@@ -52,6 +52,9 @@
   top: 0;
   left: 0;
   z-index: 3; /* above the readout (1) and the dock (2) */
+  /* Rotate around the track point itself (the craft is centred on 0 0); the default 50% 50%
+     swung the craft up to ~50px off its track whenever it pointed down. */
+  transform-origin: 0 0;
   will-change: transform;
   pointer-events: none;
 }

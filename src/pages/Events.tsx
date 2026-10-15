@@ -35,7 +35,7 @@ export default function Events() {
         description="Browse every Zenin '26 event. Filter by technical or cultural, workshop or event, online or on campus, price and open registration."
       />
       <div className="container events-page__header">
-        <p className="eyebrow">The programme · 26 Sep – 15 Nov</p>
+        <p className="eyebrow">The programme · 26 Sep to 15 Nov</p>
         <h1 className="events-page__title">
           Every event, <em>in orbit</em>
         </h1>

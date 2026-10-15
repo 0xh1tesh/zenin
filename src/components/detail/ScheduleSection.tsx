@@ -33,7 +33,7 @@ export default function ScheduleSection({ schedules, num = '03' }: ScheduleSecti
                 })}
               </span>
               <span className="detail-schedule__time">
-                {formatTime(session.start_time)} – {formatTime(session.end_time)} IST
+                {formatTime(session.start_time)} to {formatTime(session.end_time)} IST
               </span>
             </div>
 

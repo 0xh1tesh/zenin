@@ -82,7 +82,7 @@ function StatCell({ value, label, suffix, index, active }: StatCellProps) {
           <Skeleton className="signal__skel" />
         ) : (
           <>
-            {displayed !== null ? displayed : '—'}
+            {displayed !== null ? displayed : '·'}
             {suffix && displayed !== null && <span className="signal__suffix">{suffix}</span>}
           </>
         )}
@@ -147,7 +147,7 @@ export default function SignalStrip({ events }: SignalStripProps) {
       <div className="container">
         <div className="signal__header">
           <p className="eyebrow signal__eyebrow">
-            <span>01 — Signal</span>
+            <span>01 · Signal</span>
             <Caret />
             <span className="signal__status-live">
               <span className="signal__status-dot" aria-hidden="true" />

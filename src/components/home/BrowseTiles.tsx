@@ -79,7 +79,7 @@ export default function BrowseTiles({ events }: BrowseTilesProps) {
       <div className="container">
         <div className="browse__header">
           <p className="eyebrow browse__eyebrow">
-            <span>04 — Browse the sky</span>
+            <span>04 · Browse the sky</span>
             <Caret />
           </p>
           <h2 className="browse__heading">Sectors &amp; disciplines</h2>

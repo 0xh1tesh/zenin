@@ -95,7 +95,7 @@ describe('format helpers', () => {
     expect(formatTeam({ min_teamsize: 1, max_teamsize: 1 })).toBe('Solo')
     expect(formatTeam({ min_teamsize: 1, max_teamsize: 3 })).toBe('Solo or teams up to 3')
     expect(formatTeam({ min_teamsize: 2, max_teamsize: 2 })).toBe('Teams of 2')
-    expect(formatTeam({ min_teamsize: 2, max_teamsize: 4 })).toBe('Teams of 2–4')
+    expect(formatTeam({ min_teamsize: 2, max_teamsize: 4 })).toBe('Teams of 2 to 4')
   })
 
   it('describes prices per person or per team', () => {

@@ -82,7 +82,8 @@ export function computePathDimensions(
 ): PathDimensions {
   if (isMobile) {
     const overlayWidth = 44
-    const topOffset = 76
+    // Start below the top bar with room for the holding ring around the craft
+    const topOffset = 108
     const bottomOffset = 96
     const trackHeight = Math.max(80, viewportHeight - topOffset - bottomOffset)
     return {
@@ -97,7 +98,8 @@ export function computePathDimensions(
   }
 
   const overlayWidth = Math.min(110, Math.max(76, viewportWidth * 0.08))
-  const topOffset = 80
+  // Start below the top bar with room for the holding ring around the craft
+  const topOffset = 124
   const bottomOffset = 76
   const trackHeight = Math.max(100, viewportHeight - topOffset - bottomOffset)
   return {

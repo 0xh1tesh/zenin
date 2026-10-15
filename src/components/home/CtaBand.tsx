@@ -53,7 +53,7 @@ export default function CtaBand() {
             </div>
 
             <p className="eyebrow cta-band__eyebrow">
-              <span>06 — Mission Departure</span>
+              <span>06 · Mission Departure</span>
               <Caret />
             </p>
             <h2 className="cta-band__title">Find your orbit</h2>
@@ -79,7 +79,7 @@ export default function CtaBand() {
               <span className="cta-band__dot" aria-hidden="true">
                 ·
               </span>
-              <span>26 SEP – 15 NOV 2026</span>
+              <span>26 SEP TO 15 NOV 2026</span>
               <span className="cta-band__dot" aria-hidden="true">
                 ·
               </span>

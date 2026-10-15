@@ -30,7 +30,7 @@ export default function Programme({ events }: ProgrammeProps) {
         <div className="programme__header">
           <div>
             <p className="eyebrow programme__eyebrow">
-              <span>05 — The programme</span>
+              <span>05 · The programme</span>
               <Caret />
             </p>
             <h2 className="programme__heading">Timeline flight plan</h2>

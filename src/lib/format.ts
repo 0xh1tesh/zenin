@@ -26,9 +26,9 @@ export function formatTime(time: string) {
 export function formatDateRange(e: Pick<EventSummary, 'schedule_summary'>) {
   const { start_date, end_date, start_time, end_time } = e.schedule_summary
   if (start_date === end_date) {
-    return `${formatDate(start_date)} · ${formatTime(start_time)}–${formatTime(end_time)}`
+    return `${formatDate(start_date)} · ${formatTime(start_time)} to ${formatTime(end_time)}`
   }
-  return `${formatDate(start_date)} – ${formatDate(end_date)}`
+  return `${formatDate(start_date)} to ${formatDate(end_date)}`
 }
 
 export function formatDeadline(iso: string) {
@@ -88,7 +88,7 @@ export function formatTeam(e: Pick<EventSummary, 'min_teamsize' | 'max_teamsize'
   if (e.max_teamsize <= 1) return 'Solo'
   if (e.min_teamsize <= 1) return `Solo or teams up to ${e.max_teamsize}`
   if (e.min_teamsize === e.max_teamsize) return `Teams of ${e.max_teamsize}`
-  return `Teams of ${e.min_teamsize}–${e.max_teamsize}`
+  return `Teams of ${e.min_teamsize} to ${e.max_teamsize}`
 }
 
 export function seatsLeft(e: Pick<EventSummary, 'total_seats' | 'seats_filled'>) {

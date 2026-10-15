@@ -21,7 +21,7 @@ export default function ClosingSoon({ events }: ClosingSoonProps) {
         <div className="closing__header">
           <div>
             <p className="eyebrow closing__eyebrow">
-              <span>03 — Closing soon</span>
+              <span>03 · Closing soon</span>
               <Caret />
             </p>
             <h2 className="closing__heading">Registration window closing</h2>
