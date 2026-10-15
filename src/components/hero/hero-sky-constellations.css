@@ -1,0 +1,302 @@
+/* ─── Hero Sky: Constellations & Blinking Stars ────────────────────── */
+/* Palette tokens only: --void, --void-2, --void-3, --bone, --sand, --coral, --blue, --muted */
+
+.hero-sky {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* z-index: 1 sits above starfield canvas (0) and alongside nebula (1), behind planet (2) */
+  z-index: 1;
+  overflow: clip;
+}
+
+/* Parallax depth sub-layers */
+.hero-sky__layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.hero-sky__layer--deep {
+  z-index: 1;
+}
+
+.hero-sky__layer--mid {
+  z-index: 2;
+}
+
+.hero-sky__layer--near {
+  z-index: 3;
+}
+
+/* ─── 1. Constellations ────────────────────────────────────────────── */
+.hero-sky__constellations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.hero-sky__constellation {
+  position: absolute;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.hero-sky__constellation svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Ambient hairline sand lines, always faintly visible */
+.hero-sky__constellation-ambient {
+  fill: none;
+  stroke: var(--sand);
+  stroke-width: 0.75;
+  opacity: 0.22;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Active tracer line that draws itself and glows during its turn */
+.hero-sky__constellation-tracer {
+  fill: none;
+  stroke: var(--sand);
+  stroke-width: 1.35;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: var(--path-len, 300);
+  stroke-dashoffset: var(--path-len, 300);
+  opacity: 0;
+  animation: hero-sky-constellation-cycle 25s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+/* Constellation stars */
+.hero-sky__constellation-star {
+  fill: var(--bone);
+  opacity: 0.85;
+}
+
+.hero-sky__constellation-star--alpha {
+  fill: var(--sand);
+}
+
+.hero-sky__constellation-star-halo {
+  fill: var(--coral);
+  opacity: 0.15;
+  transform-origin: center;
+  animation: hero-sky-star-pulse 25s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+/* Constellation mono label */
+.hero-sky__constellation-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  fill: var(--sand);
+  text-anchor: middle;
+  user-select: none;
+  opacity: 0;
+  animation: hero-sky-label-fade 25s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+/* 25s slow sequential cycle: each constellation draws, holds, and fades */
+@keyframes hero-sky-constellation-cycle {
+  0% {
+    stroke-dashoffset: var(--path-len, 300);
+    opacity: 0;
+  }
+  2% {
+    opacity: 0.95;
+  }
+  6% {
+    stroke-dashoffset: 0;
+    opacity: 0.95;
+  }
+  14% {
+    stroke-dashoffset: 0;
+    opacity: 0.85;
+  }
+  18% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+  20%, 100% {
+    stroke-dashoffset: var(--path-len, 300);
+    opacity: 0;
+  }
+}
+
+@keyframes hero-sky-star-pulse {
+  0%, 20%, 100% {
+    transform: scale(1);
+    opacity: 0.15;
+  }
+  6%, 13% {
+    transform: scale(1.7);
+    opacity: 0.55;
+  }
+  18% {
+    transform: scale(1);
+    opacity: 0.15;
+  }
+}
+
+@keyframes hero-sky-label-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  3% {
+    opacity: 0;
+  }
+  6% {
+    opacity: 0.72;
+    transform: translateY(0);
+  }
+  14% {
+    opacity: 0.72;
+    transform: translateY(0);
+  }
+  18% {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  20%, 100% {
+    opacity: 0;
+  }
+}
+
+/* ─── 2. Blinking Stars ────────────────────────────────────────────── */
+.hero-sky__blinkers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.hero-sky__star {
+  position: absolute;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.hero-sky__star-dot {
+  display: block;
+  border-radius: 50%;
+  background: var(--bone);
+}
+
+/* Slow twinkle */
+.hero-sky__star--slow-twinkle .hero-sky__star-dot {
+  animation: hero-sky-slow-twinkle var(--dur, 5s) ease-in-out infinite var(--del, 0s);
+}
+
+@keyframes hero-sky-slow-twinkle {
+  0%, 100% {
+    opacity: 0.25;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.2);
+  }
+}
+
+/* Quick double blink */
+.hero-sky__star--double-blink .hero-sky__star-dot {
+  animation: hero-sky-double-blink var(--dur, 4s) ease-in-out infinite var(--del, 0s);
+}
+
+@keyframes hero-sky-double-blink {
+  0%, 65%, 100% {
+    opacity: 0.2;
+    transform: scale(0.9);
+  }
+  12% {
+    opacity: 1;
+    transform: scale(1.35);
+  }
+  20% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  28% {
+    opacity: 0.95;
+    transform: scale(1.4);
+  }
+  40% {
+    opacity: 0.2;
+    transform: scale(0.9);
+  }
+}
+
+/* Color shift: bone -> coral -> blue -> bone */
+.hero-sky__star--color-shift .hero-sky__star-dot {
+  animation: hero-sky-color-shift var(--dur, 6s) ease-in-out infinite var(--del, 0s);
+}
+
+@keyframes hero-sky-color-shift {
+  0%, 100% {
+    background: var(--bone);
+    opacity: 0.45;
+  }
+  33% {
+    background: var(--coral);
+    opacity: 0.9;
+    box-shadow: 0 0 3px var(--coral);
+  }
+  66% {
+    background: var(--blue);
+    opacity: 0.75;
+    box-shadow: 0 0 3px var(--blue);
+  }
+}
+
+/* Hero stars with cross-shaped diffraction spikes */
+.hero-sky__star--hero-star {
+  overflow: visible;
+}
+
+.hero-sky__star--hero-star .hero-sky__star-dot {
+  background: var(--sand);
+  box-shadow: 0 0 4px var(--sand);
+  animation: hero-sky-hero-core var(--dur, 4s) ease-in-out infinite var(--del, 0s);
+}
+
+.hero-sky__star-spikes {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow: visible;
+  animation: hero-sky-hero-spikes var(--dur, 4s) ease-in-out infinite var(--del, 0s);
+}
+
+@keyframes hero-sky-hero-core {
+  0%, 100% {
+    opacity: 0.7;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes hero-sky-hero-spikes {
+  0%, 100% {
+    opacity: 0.45;
+    transform: translate(-50%, -50%) scale(0.85);
+  }
+  50% {
+    opacity: 0.95;
+    transform: translate(-50%, -50%) scale(1.25);
+  }
+}

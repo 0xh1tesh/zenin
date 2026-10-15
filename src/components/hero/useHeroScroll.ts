@@ -177,10 +177,17 @@ export function useHeroScroll(track: RefObject<HTMLElement | null>) {
         // Far layers drift slowly, near layers rush past: that speed difference is the depth.
         tl.to(q('.hero__stars'), { scale: 1.25, duration: 1 }, 0)
         tl.to(q('.hero__nebula'), { scale: 1.2, yPercent: -6, duration: 1 }, 0)
+        tl.to(q('.hero-sky__constellations'), { scale: 1.15, yPercent: -4, duration: 1 }, 0)
+        tl.to(q('.hero-sky__gas-giant'), { yPercent: -20, scale: 1.2, duration: 1 }, 0)
+        tl.to(q('.hero-sky__crescent-moon'), { yPercent: -15, scale: 1.12, duration: 1 }, 0)
+        tl.to(q('.hero-sky__galaxy'), { yPercent: -12, scale: 1.15, duration: 1 }, 0)
+        tl.to(q('.hero-sky__blinkers'), { scale: 1.18, duration: 1 }, 0)
+        tl.to(q('.hero-sky__aurora'), { yPercent: -8, opacity: 0.05, duration: 0.85 }, 0)
         tl.to(q('.hero__title'), { scale: 1.6, opacity: 0, duration: 0.9 }, 0)
         tl.to(q('.hero__planet, .hero__orbits'), { scale: mobile ? 2.2 : 2.7, yPercent: mobile ? -14 : -22, duration: 1 }, 0)
         tl.to(q('.hero__ridge'), { scale: 1.9, duration: 1 }, 0)
         tl.to(q('.hero__ridge'), { opacity: 0, duration: 0.3 }, 0.7)
+        tl.to(q('.hero-sky'), { opacity: 0, duration: 0.25 }, 0.75)
 
         // The headline lifts and grows into the viewer while the call to action stays usable.
         tl.to(q('.hero__h1'), { scale: 1.35, yPercent: -8, duration: 0.8 }, 0.1)
