@@ -17,9 +17,9 @@ export const ORBIT_CENTER = 500
 export const ORBIT_TILT_DEG = -16
 
 export const ORBITS: readonly OrbitSpec[] = [
-  { rx: 330, ry: 96, speed: 1, start: 0.6, moonR: 12 },
-  { rx: 460, ry: 134, speed: -0.6, start: 3.4, moonR: 8.5 },
-  { rx: 210, ry: 62, speed: 2.2, start: 1.8, moonR: 4 },
+  { rx: 330, ry: 96, speed: 1, start: 0.6, moonR: 18 },
+  { rx: 460, ry: 134, speed: -0.6, start: 3.4, moonR: 13 },
+  { rx: 210, ry: 62, speed: 2.2, start: 1.8, moonR: 6 },
 ]
 
 export interface OrbitPoint {
@@ -134,8 +134,8 @@ function OrbitSvg({ layer }: OrbitLayerProps) {
             </filter>
 
             <radialGradient id="hero-halo-grad">
-              <stop offset="0%" stopColor="#ef8557" stopOpacity="0.5" />
-              <stop offset="50%" stopColor="#d5360c" stopOpacity="0.2" />
+              <stop offset="0%" stopColor="#ef8557" stopOpacity="0.85" />
+              <stop offset="45%" stopColor="#d5360c" stopOpacity="0.35" />
               <stop offset="100%" stopColor="#d5360c" stopOpacity="0" />
             </radialGradient>
 
@@ -272,7 +272,7 @@ function OrbitSvg({ layer }: OrbitLayerProps) {
               className="hero__moon-halo"
               cx={0}
               cy={0}
-              r={o.moonR * 2.2}
+              r={o.moonR * 3}
               fill="url(#hero-halo-grad)"
             />
 

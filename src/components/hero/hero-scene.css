@@ -194,11 +194,6 @@
   opacity: 0.18;
 }
 
-.hero__moon {
-  fill: var(--sand);
-  opacity: 0.7;
-}
-
 /* ─── L5: Foreground ridge silhouettes ─────────────────────────────── */
 .hero__ridge {
   bottom: 0;

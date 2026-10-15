@@ -3,7 +3,12 @@
 /* Layer Stacking (Back layer sits behind planet, front sits in front) */
 .hero__orbits--back { z-index: 1; }
 .hero__planet { z-index: 2; }
-.hero__orbits--front { z-index: 3; }
+.hero__orbits--front { z-index: 6; } /* above the ridge: the near half of each orbit must stay visible */
+
+/* The moons glow coral so they read against both the dark sky and the vermilion planet. */
+.hero__moon-body {
+  filter: drop-shadow(0 0 5px rgb(239 133 87 / 0.95)) drop-shadow(0 0 16px rgb(213 54 12 / 0.75));
+}
 
 /* Far half: moons pass behind planet disc (dimmer, fainter tail) */
 .hero__orbits--back .hero__moon-wrap { opacity: 0.42; filter: brightness(0.85); }
