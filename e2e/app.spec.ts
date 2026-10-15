@@ -139,3 +139,27 @@ test.describe('accessibility', () => {
     })
   }
 })
+
+test.describe('scroll rocket', () => {
+  test('rides to the end of the page, lands, and launches back to the top', async ({ page }) => {
+    await page.goto('/events')
+    await page.mouse.move(200, 300)
+    // Wheel scrolling is the visitor's path (Lenis owns scrolling on desktop) and also mounts the lazy rocket.
+    await expect
+      .poll(
+        async () => {
+          await page.mouse.wheel(0, 4000)
+          return page.getByRole('button', { name: /launch again/i }).isVisible()
+        },
+        { timeout: 20_000 },
+      )
+      .toBe(true)
+
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze()
+    const blocking = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')
+    expect(blocking.map((v) => `${v.id}: ${v.nodes.length} node(s)`)).toEqual([])
+
+    await page.getByRole('button', { name: /launch again/i }).click()
+    await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 10_000 }).toBeLessThan(5)
+  })
+})
