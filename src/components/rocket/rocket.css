@@ -213,3 +213,10 @@
     transition: none !important;
   }
 }
+
+/* Event pages on phones and tablets carry a fixed action bar above the bottom nav: land above it */
+@media (max-width: 1023px) {
+  body:has(.detail-mobile-bar) .rocket-dock {
+    bottom: calc(var(--bottomnav-h) + 5rem);
+  }
+}

@@ -363,3 +363,25 @@ export function checkCraftClearance(
     rightClearance: Number(rightClearance.toFixed(2)),
   }
 }
+
+/** Width of the craft drawing at scale 1. */
+const CRAFT_WIDTH = 28
+
+export interface GutterFit {
+  overlayWidth: number
+  centerOffset: number
+  amplitude: number
+  craftScale: number
+}
+
+/**
+ * Fits the flight corridor into the empty margin right of the page content, so the craft never passes over text.
+ * The craft shrinks to fit narrow margins (down to half size on phones) and the S-curve narrows to what fits.
+ */
+export function fitToGutter(gutter: number): GutterFit {
+  const width = Math.max(14, gutter)
+  const craftScale = Math.min(1, Math.max(0.5, (width - 6) / CRAFT_WIDTH))
+  const craftHalfWidth = (CRAFT_WIDTH * craftScale) / 2 + 3
+  const amplitude = Math.max(0, Math.min(18, width / 2 - craftHalfWidth - 2))
+  return { overlayWidth: width, centerOffset: width / 2, amplitude, craftScale }
+}

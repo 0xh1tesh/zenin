@@ -61,6 +61,14 @@
   opacity: 0.45;
 }
 
+/* Background constellation names never cycle on by themselves (they would collide with page text);
+   they appear only while the cursor is near their constellation. */
+.deepsky-constellation-label {
+  animation: none !important;
+  opacity: 0;
+  transition: opacity 300ms var(--ease);
+}
+
 /* Planets, moons, galaxies and pulsars swell, glow and show their names */
 .hero-sky__gas-giant,
 .hero-sky__crescent-moon,

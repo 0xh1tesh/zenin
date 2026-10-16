@@ -117,3 +117,9 @@
     display: none !important;
   }
 }
+
+/* Footer text always sits above the decoration (satellite, dust, shimmer) */
+.footer__inner {
+  position: relative;
+  z-index: 2;
+}

@@ -161,6 +161,11 @@
 @media (max-width: 1023px) {
   .hero__next {
     margin-top: 0.75rem;
+    /* The planet rises behind this block on phones and tablets: a dark backing keeps every line readable */
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: rgb(16 16 16 / 0.62);
   }
 }
 

@@ -329,3 +329,14 @@
     display: inline;
   }
 }
+
+/* Phones and tablets: the bottom of the footer is the rocket's landing zone, so no footer text sits under it */
+@media (max-width: 1023px) {
+  .footer {
+    padding-bottom: 8rem;
+  }
+
+  body:has(.detail-mobile-bar) .footer {
+    padding-bottom: 13rem;
+  }
+}

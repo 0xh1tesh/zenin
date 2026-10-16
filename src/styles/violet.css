@@ -1,0 +1,65 @@
+/* ─── A dark purplish thread through the cosmos ─────────────────────────────
+   Selectors carry one extra level (:root) so they win over component styles that load later. */
+
+/* Hero: a violet nebula blooms between the blue haze and the vermilion glow */
+:root .hero__nebula::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    /* full strength here: the whole nebula layer is drawn at 35% opacity */
+    radial-gradient(ellipse 55% 45% at 58% 26%, rgb(108 79 179 / 1), transparent 70%),
+    radial-gradient(ellipse 45% 40% at 16% 70%, rgb(80 52 140 / 1), transparent 70%);
+}
+
+/* The deep sky behind every page picks up violet clouds */
+:root .deepsky-wash::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle 700px at 78% 22%, rgb(59 39 99 / 0.28), transparent 70%),
+    radial-gradient(circle 560px at 20% 68%, rgb(108 79 179 / 0.14), transparent 70%);
+}
+
+/* A few stars burn lilac */
+:root .deepsky-star:nth-child(6n + 2),
+:root .hero-sky__star:nth-child(5n + 3) .hero-sky__star-dot {
+  background: var(--lilac);
+}
+
+/* Section bands: violet dusk instead of flat brown-black */
+:root .signal {
+  background: linear-gradient(180deg, rgb(16 16 16 / 0) 0%, rgb(27 20 48 / 0.7) 100%);
+}
+
+:root .cta-band {
+  background: radial-gradient(ellipse 70% 80% at 50% 45%, rgb(59 39 99 / 0.38), transparent 70%);
+}
+
+/* The footer wordmark rises out of a violet glow */
+:root .footer {
+  background: radial-gradient(ellipse 80% 60% at 50% 100%, rgb(59 39 99 / 0.35), transparent 70%);
+}
+
+/* Chrome: the bars take on a faint violet cast when solid */
+:root .topbar.is-solid {
+  background: rgb(19 15 30 / 0.9);
+}
+
+:root .bottomnav {
+  background: rgb(19 15 30 / 0.95);
+}
+
+/* Event cards: a violet rim light on hover and keyboard focus */
+:root .ecard:hover,
+:root .ecard:focus-within {
+  box-shadow:
+    0 0 0 1px rgb(108 79 179 / 0.45),
+    0 18px 40px -18px rgb(108 79 179 / 0.55);
+}
+
+::selection {
+  background: rgb(108 79 179 / 0.55);
+  color: var(--bone);
+}

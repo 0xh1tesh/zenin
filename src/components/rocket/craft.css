@@ -3,15 +3,9 @@
   position: relative;
   width: 28px;
   height: 48px;
-  transform: translate(-50%, -50%);
+  /* --craft-scale shrinks the craft to fit the empty margin beside the content (set by ScrollRocket) */
+  transform: translate(-50%, -50%) scale(var(--craft-scale, 1));
   transform-origin: center center;
-}
-
-@media (max-width: 639px) {
-  .rocket-craft {
-    width: 22px;
-    height: 38px;
-  }
 }
 
 /* Idle Bobbing Motion */

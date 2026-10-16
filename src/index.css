@@ -190,7 +190,7 @@ html.lenis body {
 
 .btn[disabled],
 .btn[aria-disabled='true'] {
-  opacity: 0.5;
+  opacity: 0.7; /* still reads as unavailable, but its label stays easy to read */
   cursor: not-allowed;
   pointer-events: none;
 }

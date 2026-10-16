@@ -5,6 +5,7 @@ import {
   calculateScrollProgress,
   computeFlameScale,
   computePathDimensions,
+  fitToGutter,
   computePathPoint,
   computePathTangent,
   computeReentryHeat,
@@ -24,7 +25,6 @@ import {
   smoothVelocity,
 } from './flight'
 import { LandingPad } from './LandingPad'
-import { MissionHud } from './MissionHud'
 import { OrbitalDock } from './OrbitalDock'
 import {
   createParticlePool,
@@ -40,6 +40,39 @@ import { WaypointBeacons } from './WaypointBeacons'
 import './rocket.css'
 
 const DOCK_VISIBLE_AT = 0.93
+/** The holding ring (68px) only appears where the margin beside the content can hold it. */
+const DOCK_RING_MIN_GUTTER = 72
+
+const FIXED_CHROME = '.topbar, .rail, .bottom-nav, .rocket-overlay, .sr-only, [aria-hidden="true"]'
+
+/**
+ * Width of the empty margin between the rightmost piece of page content (any visible text, or a content
+ * column's edge) and the viewport edge. Measured on resize and route change only, never per frame.
+ */
+function measureContentGutter(): number {
+  const viewportWidth = document.documentElement.clientWidth
+  const root = document.getElementById('root')
+  if (!root) return 44
+  let contentRight = 0
+  for (const container of root.querySelectorAll<HTMLElement>('main .container, footer .container')) {
+    const box = container.getBoundingClientRect()
+    if (box.width === 0) continue
+    contentRight = Math.max(contentRight, box.right - parseFloat(getComputedStyle(container).paddingRight))
+  }
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
+  const range = document.createRange()
+  while (walker.nextNode()) {
+    const node = walker.currentNode
+    const owner = node.parentElement
+    if (!node.textContent?.trim() || !owner || owner.closest(FIXED_CHROME)) continue
+    range.selectNodeContents(node)
+    for (const rect of range.getClientRects()) {
+      // Text further right than the viewport is inside a horizontal scroller, not page content.
+      if (rect.width > 0 && rect.right <= viewportWidth) contentRight = Math.max(contentRight, rect.right)
+    }
+  }
+  return contentRight > 0 ? Math.max(0, viewportWidth - contentRight - 2) : 44
+}
 /** Clear space between the readout's right edge and the craft's centre line (craft + flame reach ~24px). */
 const HUD_GAP = 44
 const POS_EASE = 0.35
@@ -59,11 +92,26 @@ export default function ScrollRocket() {
   const [ripplingIdx, setRipplingIdx] = useState<number | null>(null)
   const { beacons, updateBeacons } = useWaypoints(location.pathname)
 
+  const [craftScale, setCraftScale] = useState(1)
+  const craftScaleRef = useRef(1)
   const [dims, setDims] = useState<PathDimensions>(() => {
     const w = typeof window !== 'undefined' ? window.innerWidth : 1200
     const h = typeof window !== 'undefined' ? window.innerHeight : 800
     return computePathDimensions(w, h, w < 640)
   })
+
+  /** Re-fits the flight corridor to the empty margin right of the page content (never over text). */
+  const refitTrack = useCallback(() => {
+    const fit = fitToGutter(measureContentGutter())
+    craftScaleRef.current = fit.craftScale
+    setCraftScale(fit.craftScale)
+    setDims({
+      ...computePathDimensions(window.innerWidth, window.innerHeight, window.innerWidth < 640),
+      overlayWidth: fit.overlayWidth,
+      centerOffset: fit.centerOffset,
+      amplitude: fit.amplitude,
+    })
+  }, [])
 
   const containerRef = useRef<HTMLDivElement>(null)
   const moverRef = useRef<HTMLDivElement>(null)
@@ -104,9 +152,16 @@ export default function ScrollRocket() {
     if (!containerRef.current || !pad) return null
     const pBox = pad.getBoundingClientRect()
     const oBox = containerRef.current.getBoundingClientRect()
-    const halfH = window.innerWidth < 640 ? 19 : 24
+    const halfH = 24 * craftScaleRef.current
     return { x: pBox.left - oBox.left + pBox.width / 2, y: pBox.top - oBox.top + PAD_SURFACE_Y - halfH }
   }, [])
+
+  // A new page brings a new content width; re-fit once it has rendered.
+  useEffect(() => {
+    refitTrack()
+    const timer = setTimeout(refitTrack, 600)
+    return () => clearTimeout(timer)
+  }, [location.pathname, refitTrack])
 
   const particlePoolRef = useRef(createParticlePool(MAX_PARTICLES_DESKTOP))
   const pathD = useMemo(() => generateSvgPathString(dims, 60), [dims])
@@ -129,7 +184,7 @@ export default function ScrollRocket() {
   }, [pathD])
 
   useEffect(() => {
-    const onResize = () => setDims(computePathDimensions(window.innerWidth, window.innerHeight, window.innerWidth < 640))
+    const onResize = refitTrack
     onResize()
     window.addEventListener('resize', onResize, { passive: true })
     const obs = new ResizeObserver(() => {
@@ -357,7 +412,11 @@ export default function ScrollRocket() {
   }, [])
 
   return (
-    <div ref={containerRef} className="rocket-overlay" style={{ width: dims.overlayWidth }}>
+    <div
+      ref={containerRef}
+      className="rocket-overlay"
+      style={{ width: dims.overlayWidth, '--craft-scale': craftScale } as React.CSSProperties}
+    >
       <svg
         className="rocket-track-svg"
         viewBox={`0 0 ${dims.overlayWidth} ${window.innerHeight || 800}`}
@@ -374,15 +433,11 @@ export default function ScrollRocket() {
         />
       </svg>
 
-      <OrbitalDock isDocked={isDockedState} x={dockPoint.x} y={dockPoint.y} />
+      {dims.overlayWidth >= DOCK_RING_MIN_GUTTER && (
+        <OrbitalDock isDocked={isDockedState} x={dockPoint.x} y={dockPoint.y} />
+      )}
 
       {!reducedMotion && <ParticleTrail particleElsRef={particleElsRef} />}
-
-      <MissionHud
-        containerRef={hudContainerRef}
-        altRef={hudAltRef}
-        sectionRef={hudSectionRef}
-      />
 
       <div ref={moverRef} className="rocket-mover">
         <RocketCraft

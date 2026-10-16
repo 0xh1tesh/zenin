@@ -103,6 +103,7 @@ export default function FieldFlight({ events }: FieldFlightProps) {
             opacity: i === 0 ? 1 : 0,
             scale: i === 0 ? 1 : 0.72,
           }))
+          gsap.set(slides.slice(1).map((s) => s.querySelector('.field__info')).filter(Boolean), { opacity: 0 })
 
           const tl = gsap.timeline({
             scrollTrigger: {
@@ -120,6 +121,12 @@ export default function FieldFlight({ events }: FieldFlightProps) {
             const prev = slides[i - 1]
             tl.to(prev, { z: -600, opacity: 0, scale: 0.82, duration: 1 }, i - 1)
             tl.to(slide, { z: 0, opacity: 1, scale: 1, duration: 1 }, i - 1)
+            // Titles never stack: the leaving card's text is gone in the first third of the hand-off,
+            // the arriving card's text appears only in the last third.
+            const prevInfo = prev.querySelector('.field__info')
+            const nextInfo = slide.querySelector('.field__info')
+            if (prevInfo) tl.to(prevInfo, { opacity: 0, duration: 0.3 }, i - 1)
+            if (nextInfo) tl.fromTo(nextInfo, { opacity: 0 }, { opacity: 1, duration: 0.3, immediateRender: false }, i - 0.3)
             // expose tab access for the visible slide
             tl.call(() => {
               slides.forEach((s, j) => s.setAttribute('aria-hidden', String(j !== i)))

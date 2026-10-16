@@ -28,6 +28,12 @@
   --blue: #226192; /* nebula haze, decorative only */
   --muted: #9c958a; /* secondary text, 6.4:1 */
 
+  /* Deep violet: atmosphere only (glows, tints, a few stars); coral stays the action colour */
+  --violet-deep: #1b1430; /* surface tint */
+  --violet: #3b2763; /* nebula and glow, decorative only */
+  --violet-glow: #6c4fb3; /* small decorative highlights */
+  --lilac: #b8a4e8; /* the one text-safe violet, 8.1:1 on --void */
+
   --line: rgb(230 213 189 / 0.14);
   --line-strong: rgb(230 213 189 / 0.34);
 
